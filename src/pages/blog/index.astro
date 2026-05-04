@@ -11,7 +11,21 @@ const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 
-const allTags = [...new Set(posts.flatMap((post) => post.data.tags || []))].sort();
+// Robuste Tag-Extraktion
+const allTags = [...new Set(posts.flatMap((post) => {
+	const tags = post.data.tags;
+	if (Array.isArray(tags)) return tags;
+	if (typeof tags === 'string') return [tags];
+	return [];
+}))].filter(Boolean).sort();
+
+const tagCounts = allTags.reduce((acc, tag) => {
+	acc[tag] = posts.filter(post => {
+		const tags = post.data.tags;
+		return Array.isArray(tags) ? tags.includes(tag) : tags === tag;
+	}).length;
+	return acc;
+}, {} as Record<string, number>);
 ---
 
 <!doctype html>
@@ -36,16 +50,25 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags || []))].sort
 				top: 2rem;
 				display: flex;
 				flex-direction: column;
-				gap: 0.5rem;
+				gap: 0.25rem;
+				background: #f9f9f9;
+				padding: 1.25rem;
+				border-radius: 12px;
+				border: 1px solid #eee;
 			}
 			.tag-checkbox-container {
-				display: block;
+				display: flex;
+				align-items: center;
 				position: relative;
-				padding-left: 35px;
-				margin-bottom: 12px;
+				padding: 6px 8px 6px 35px;
 				cursor: pointer;
-				font-size: 1rem;
+				font-size: 0.95rem;
 				user-select: none;
+				border-radius: 6px;
+				transition: background 0.2s;
+			}
+			.tag-checkbox-container:hover {
+				background: #f0f0f0;
 			}
 			.tag-checkbox-container input {
 				position: absolute;
@@ -56,18 +79,19 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags || []))].sort
 			}
 			.checkmark {
 				position: absolute;
-				top: 0;
-				left: 0;
-				height: 25px;
-				width: 25px;
-				background-color: #eee;
+				top: 50%;
+				left: 8px;
+				transform: translateY(-50%);
+				height: 18px;
+				width: 18px;
+				background-color: #fff;
+				border: 2px solid #ddd;
 				border-radius: 4px;
-			}
-			.tag-checkbox-container:hover input ~ .checkmark {
-				background-color: #ccc;
+				transition: all 0.2s;
 			}
 			.tag-checkbox-container input:checked ~ .checkmark {
 				background-color: var(--accent);
+				border-color: var(--accent);
 			}
 			.checkmark:after {
 				content: "";
@@ -78,17 +102,29 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags || []))].sort
 				display: block;
 			}
 			.tag-checkbox-container .checkmark:after {
-				left: 9px;
-				top: 5px;
-				width: 5px;
-				height: 10px;
+				left: 5px;
+				top: 1px;
+				width: 4px;
+				height: 8px;
 				border: solid white;
-				border-width: 0 3px 3px 0;
+				border-width: 0 2px 2px 0;
 				transform: rotate(45deg);
 			}
-			hr {
-				border: 0;
-				border-top: 1px solid #eee;
+			.tag-label {
+				flex-grow: 1;
+				color: var(--black);
+			}
+			.count {
+				font-size: 0.75rem;
+				color: #888;
+				background: #eee;
+				padding: 1px 6px;
+				border-radius: 10px;
+				margin-left: 8px;
+			}
+			.divider {
+				height: 1px;
+				background: #eee;
 				margin: 0.5rem 0;
 			}
 			section {
@@ -159,19 +195,21 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags || []))].sort
 		<Header />
 		<main>
 			<aside>
-				<h3>Filter</h3>
+				<h3>Kategorien</h3>
 				<div class="filter-section">
-					<label class="tag-checkbox-container">
+					<label class="tag-checkbox-container all-posts">
 						<input type="checkbox" id="check-all" checked />
 						<span class="checkmark"></span>
-						Alle Beiträge
+						<span class="tag-label">Alle Beiträge</span>
+						<span class="count">{posts.length}</span>
 					</label>
-					<hr />
+					<div class="divider"></div>
 					{allTags.map((tag) => (
 						<label class="tag-checkbox-container">
 							<input type="checkbox" class="tag-checkbox" value={tag} />
 							<span class="checkmark"></span>
-							{tag}
+							<span class="tag-label">{tag}</span>
+							<span class="count">{tagCounts[tag]}</span>
 						</label>
 					))}
 				</div>
