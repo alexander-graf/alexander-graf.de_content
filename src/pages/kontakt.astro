@@ -1,0 +1,25 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+---
+
+<!doctype html>
+<html lang="de">
+	<head>
+		<BaseHead title={`Kontakt | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>Kontakt</h1>
+			<p>
+				Hast du Fragen oder möchtest ein Projekt besprechen? Schreib mir einfach eine Nachricht über das Formular unten.
+			</p>
+			<ContactForm />
+		</main>
+		<Footer />
+	</body>
+</html>

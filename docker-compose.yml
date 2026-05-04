@@ -1,0 +1,37 @@
+services:
+  astro:
+    build: .
+    container_name: alexander-graf-astro
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.alex-astro.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.alex-astro.entrypoints=websecure"
+      - "traefik.http.routers.alex-astro.tls.certresolver=myresolver"
+      - "traefik.http.services.alex-astro.loadbalancer.server.port=80"
+
+  cms-auth:
+    build: ./oauth-proxy
+    container_name: alexander-graf-cms-auth
+    restart: unless-stopped
+    environment:
+      - OAUTH_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - OAUTH_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - ORIGIN=https://${DOMAIN}
+      - PORT=3000
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.alex-cms-auth.rule=Host(`${DOMAIN}`) && (PathPrefix(`/auth`) || PathPrefix(`/callback`))"
+      - "traefik.http.routers.alex-cms-auth.entrypoints=websecure"
+      - "traefik.http.routers.alex-cms-auth.tls.certresolver=myresolver"
+      - "traefik.http.services.alex-cms-auth.loadbalancer.server.port=3000"
+
+networks:
+  proxy:
+    external: true

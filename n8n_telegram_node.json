@@ -1,0 +1,33 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "813858703",
+        "text": "=Neue Kontaktanfrage (alexander-graf.de)\n\nName: {{ $json.body.name || $json.name }}\nE-Mail: {{ $json.body.email || $json.email }}\n\nNachricht:\n{{ $json.body.message || $json.message }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "5cf8e7ba-d76e-4a5c-977a-8937fca1d1cc",
+      "name": "Send a text message",
+      "credentials": {
+        "telegramApi": {
+          "id": "B1z45eNYdUKkVIxI",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "connections": {},
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fea5593322bb040e6f94543d43decf32b2975a1044088f22bf485237f2823963"
+  }
+}

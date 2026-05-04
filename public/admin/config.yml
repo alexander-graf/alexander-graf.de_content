@@ -1,0 +1,23 @@
+backend:
+  name: github
+  repo: alexander-graf/alexander-graf.de_content
+  branch: main
+  base_url: https://alexander-graf.de
+  auth_endpoint: auth
+
+media_folder: "public/assets/blog"
+public_folder: "/assets/blog"
+
+collections:
+  - name: "blog"
+    label: "Blog"
+    folder: "src/content/blog"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Description", name: "description", widget: "string" }
+      - { label: "Publish Date", name: "pubDate", widget: "datetime", format: "MMM DD YYYY" }
+      - { label: "Hero Image", name: "heroImage", widget: "image", default: "../../assets/blog-placeholder-1.jpg" }
+      - { label: "Tags", name: "tags", widget: "list", default: ["Allgemein"] }
+      - { label: "Body", name: "body", widget: "markdown" }
