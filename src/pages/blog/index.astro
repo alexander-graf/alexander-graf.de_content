@@ -11,13 +11,15 @@ const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 
-// Robuste Tag-Extraktion
 const allTags = [...new Set(posts.flatMap((post) => {
 	const tags = post.data.tags;
 	if (Array.isArray(tags)) return tags;
 	if (typeof tags === 'string') return [tags];
 	return [];
 }))].filter(Boolean).sort();
+
+console.log('GEFUNDENE TAGS:', allTags);
+console.log('ANZAHL POSTS:', posts.length);
 
 const tagCounts = allTags.reduce((acc, tag) => {
 	acc[tag] = posts.filter(post => {
