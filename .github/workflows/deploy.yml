@@ -20,5 +20,6 @@ jobs:
 
       - name: Deploy with Docker Compose
         run: |
-          docker compose down
+          docker stop alexander-graf-astro alexander-graf-cms-auth || true
+          docker rm alexander-graf-astro alexander-graf-cms-auth || true
           docker compose up -d --build
