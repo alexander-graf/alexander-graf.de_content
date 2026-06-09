@@ -1,6 +1,6 @@
 ---
-title: "Erstelle ein Bash-Script, das den aktuellen Ordner automatisch als tar.gz-Datei mit Zeitstempel im übergeordneten Backup-Verzeichnis sichert."
-description: "Erstelle ein Bash-Script, das den aktuellen Ordner automatisch als tar.gz-Datei mit Zeitstempel im übergeordneten Backup-Verzeichnis sichert. 🤔 Frage Erstelle e"
+title: "Ordner per Bash-Skript automatisch als tar.gz sichern"
+description: "Erfahre, wie du ein einfaches Bash-Skript schreibst, um das aktuelle Verzeichnis als tar.gz-Archiv mit Zeitstempel in einem Backup-Ordner zu sichern."
 date: 2024-12-25
 tags:
   - Allgemein
@@ -9,37 +9,9 @@ tags:
 draft: false
 ---
 
+Um ein Bash-Skript zu erstellen, das den aktuellen Ordner automatisch als `.tar.gz`-Datei mit einem Zeitstempel im übergeordneten Backup-Verzeichnis sichert, kannst du das folgende Beispiel verwenden:
 
-Erstelle ein Bash-Script, das den aktuellen Ordner automatisch als tar.gz-Datei mit Zeitstempel im übergeordneten Backup-Verzeichnis sichert.
-
-
-
-
-
-
-
-🤔 Frage
-
-
-
-Erstelle ein Bash-Script, das den aktuellen Ordner automatisch als tar.gz-Datei mit Zeitstempel im übergeordneten Backup-Verzeichnis sichert.
-
-
-
-
-
-🤖 Antwort
-
-
-
-# Finale Antwort
-
-**Zeitstempel:** 2024-12-25_00-47-20
-
-
-Um ein Bash-Script zu erstellen, das den aktuellen Ordner automatisch als tar.gz-Datei mit einem Zeitstempel im übergeordneten Backup-Verzeichnis sichert, können Sie das folgende Beispiel verwenden:
-
-
+```bash
 #!/bin/bash
 
 # Verzeichnis für Backups festlegen
@@ -59,64 +31,29 @@ tar -czf "$BACKUP_FILE" .
 
 # Bestätigung ausgeben
 echo "Backup wurde erfolgreich erstellt: $BACKUP_FILE"
+```
 
+## Erklärung des Skripts
 
-### Erklärung des Scripts:
+* **Backup-Verzeichnis festlegen**: Das Skript legt das Verzeichnis fest, in dem die Backups gespeichert werden. In diesem Fall ist es das übergeordnete Verzeichnis (`../backup`).
+* **Zeitstempel generieren**: Der Zeitstempel wird im Format `YYYY-MM-DD_HH-MM-SS` erstellt, um eine eindeutige Identifikation der Backup-Datei zu gewährleisten.
+* **Backup-Dateiname definieren**: Der Name der Backup-Datei wird unter Verwendung des Zeitstempels generiert.
+* **Verzeichnis erstellen**: Mit `mkdir -p` wird sichergestellt, dass das Backup-Verzeichnis existiert; falls nicht, wird es erstellt.
+* **Daten sichern**: Der Befehl `tar -czf` wird verwendet, um alle Dateien im aktuellen Verzeichnis in eine komprimierte `.tar.gz`-Datei zu packen.
+* **Bestätigung ausgeben**: Am Ende gibt das Skript eine Bestätigung aus, dass das Backup erfolgreich erstellt wurde.
 
+## Verwendung
 
+Um das Skript auszuführen, speichere es in einer Datei (z. B. `backup.sh`) und gib ihr Ausführungsrechte:
 
-**Backup-Verzeichnis festlegen**: Das Script legt das Verzeichnis fest, in dem die Backups gespeichert werden. In diesem Fall ist es das übergeordnete Verzeichnis (../backup).
-
-
-
-
-**Zeitstempel generieren**: Der Zeitstempel wird im Format YYYY-MM-DD_HH-MM-SS erstellt, um eine eindeutige Identifikation der Backup-Datei zu gewährleisten.
-
-
-
-
-**Backup-Dateiname definieren**: Der Name der Backup-Datei wird unter Verwendung des Zeitstempels generiert.
-
-
-
-
-**Verzeichnis erstellen**: Mit mkdir -p wird sichergestellt, dass das Backup-Verzeichnis existiert; falls nicht, wird es erstellt.
-
-
-
-
-**Daten sichern**: Der Befehl tar -czf wird verwendet, um alle Dateien im aktuellen Verzeichnis in eine komprimierte tar.gz-Datei zu packen.
-
-
-
-
-**Bestätigung ausgeben**: Am Ende gibt das Script eine Bestätigung aus, dass das Backup erfolgreich erstellt wurde.
-
-
-
-
-### Verwendung:
-
-Um das Script auszuführen, speichern Sie es in einer Datei, z.B. backup.sh, und geben Sie ihm Ausführungsrechte mit:
-
-
+```bash
 chmod +x backup.sh
+```
 
+Führe dann das Skript aus:
 
-Führen Sie dann das Script aus:
-
-
+```bash
 ./backup.sh
+```
 
-
-Das Script erstellt ein Backup des aktuellen Ordners im angegebenen Backup-Verzeichnis mit einem Zeitstempel im Dateinamen.
-
-
-
-
-
-
-
-
-
-Generiert mit KI am 25.12.2024 um 00:47 Uhr
+Das Skript erstellt ein Backup des aktuellen Ordners im angegebenen Backup-Verzeichnis mit einem Zeitstempel im Dateinamen.
