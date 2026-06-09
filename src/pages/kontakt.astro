@@ -115,9 +115,14 @@ const { title, description, info } = entry.data;
     color: #0aa8a7 !important; 
     font-weight: 600 !important; 
     margin-bottom: 1rem !important; 
+    border-radius: 0.75rem !important;
+  }
+  .mauticform-message:empty {
+    display: none !important;
+  }
+  .mauticform-message:not(:empty) {
     padding: 1rem !important;
     background: #edf6f5 !important;
-    border-radius: 0.75rem !important;
   }
   .mauticform-error,
   .mauticform-errormsg { 
