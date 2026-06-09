@@ -1,8 +1,8 @@
 backend:
   name: github
-  repo: alexander-graf/alexandergraf.de
+  repo: alexander-graf/alexander-graf.de_content
   branch: main
-  base_url: https://alexandergraf.de
+  base_url: https://alexander-graf.de
   auth_endpoint: auth
 
 media_folder: "public/images"
