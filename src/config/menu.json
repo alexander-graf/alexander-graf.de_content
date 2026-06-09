@@ -1,0 +1,57 @@
+{
+  "main": [
+    {
+      "name": "Home",
+      "url": "/"
+    },
+    {
+      "name": "Blog",
+      "url": "/blog"
+    },
+    {
+      "name": "Mein Weg",
+      "url": "/work"
+    },
+    {
+      "name": "Kontakt",
+      "url": "/kontakt"
+    }
+  ],
+  "footer": [
+    {
+      "name": "Über mich",
+      "menu": [
+        {
+          "text": "Mein Weg",
+          "url": "/work"
+        },
+        {
+          "text": "Kontakt",
+          "url": "/kontakt"
+        }
+      ]
+    },
+    {
+      "name": "Inhalte",
+      "menu": [
+        {
+          "text": "Blog",
+          "url": "/blog"
+        }
+      ]
+    },
+    {
+      "name": "Rechtliches",
+      "menu": [
+        {
+          "text": "Impressum",
+          "url": "/impressum"
+        },
+        {
+          "text": "Datenschutz",
+          "url": "/datenschutz"
+        }
+      ]
+    }
+  ]
+}

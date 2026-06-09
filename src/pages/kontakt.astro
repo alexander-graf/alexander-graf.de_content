@@ -1,104 +1,130 @@
 ---
-import PageLayout from "@layouts/PageLayout.astro"
-import TopLayout from "@layouts/TopLayout.astro"
-import BottomLayout from "@layouts/BottomLayout.astro"
+import Base from "@/layouts/Base.astro";
+import { markdownify } from "@/lib/utils/textConverter";
+import type { CollectionEntry } from "astro:content";
+import { getEntry } from "astro:content";
 
-const page = {
-  TITLE: "Kontakt",
-  DESCRIPTION: "Schreib mir direkt eine Nachricht.",
-}
+const entry = (await getEntry(
+  "contact",
+  "-index"
+)) as CollectionEntry<"contact">;
+const { title, description, info } = entry.data;
 ---
 
-<PageLayout title={page.TITLE} description={page.DESCRIPTION}>
-  <TopLayout>
-    <div class="animate page-heading">
-      Kontakt
-    </div>
-  </TopLayout>
-  <BottomLayout>
-    <div class="animate">
-      <p class="mb-8 opacity-75">
-        Hast du eine Frage, ein Projekt oder willst einfach nur Moin sagen? Schreib mir direkt.
-      </p>
-      <div class="mautic-form-wrapper">
-        <script
-          is:inline
-          src="https://mautic.alexandergraf.de/form/generate.js?id=2"
-          type="text/javascript"
-          charset="utf-8"
-          async
-        ></script>
-        <noscript>
-          <a href="https://mautic.alexandergraf.de/form/2">Zum Kontaktformular</a>
-        </noscript>
+<Base title={title} description={description}>
+  <section class="section">
+    <div class="container">
+      <h1 class="text-center font-semibold mb-12" set:html={markdownify(title)} />
+      <div class="section row pb-0 justify-center">
+        <!-- Form Section -->
+        <div class="col-12 md:col-6 lg:col-7 mb-8 md:mb-0">
+          <div class="bg-white p-6 md:p-8 rounded-2xl border border-border shadow-sm">
+            <div class="mautic-form-wrapper">
+              <script
+                is:inline
+                src="https://mautic.alexandergraf.de/form/generate.js?id=2"
+                type="text/javascript"
+                charset="utf-8"
+                async
+              ></script>
+              <noscript>
+                <a href="https://mautic.alexandergraf.de/form/2" class="btn btn-primary">Zum Kontaktformular</a>
+              </noscript>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Info Section -->
+        <div class="content col-12 md:col-6 lg:col-5">
+          <div class="bg-light/50 p-6 md:p-8 rounded-2xl border border-border">
+            <h4 class="font-semibold mb-4" set:html={markdownify(info?.title)} />
+            <p class="text-text/80 mb-6" set:html={markdownify(info?.description)} />
+            <ul class="contact-list list-none pl-0 space-y-4">
+              {
+                info?.contacts?.map((contact) => (
+                  <li class="flex items-start">
+                    <span
+                      class="text-text-dark font-medium prose"
+                      set:html={markdownify(contact)}
+                    />
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
-  </BottomLayout>
-</PageLayout>
+  </section>
+</Base>
 
 <style is:global>
+  /* Mautic contact form styling integrated with Bigspring Theme */
   .mauticform_wrapper {
     max-width: 100% !important;
     margin: 0 !important;
+    font-family: inherit !important;
   }
   .mauticform-name { display: none; }
   .mauticform-input,
   .mauticform-textarea,
   .mauticform-selectbox {
-    background: transparent !important;
-    border: 1px solid rgb(0 0 0 / 0.15) !important;
-    border-radius: 0.5rem !important;
-    padding: 0.625rem 0.875rem !important;
-    color: inherit !important;
-    font-size: 0.9rem !important;
+    background: #fff !important;
+    border: 1px solid #e9e9e9 !important;
+    border-radius: 0.75rem !important; /* soft rounded edges */
+    padding: 0.75rem 1rem !important;
+    color: #222 !important;
+    font-size: 0.95rem !important;
     font-family: inherit !important;
     width: 100% !important;
     box-sizing: border-box !important;
-  }
-  .dark .mauticform-input,
-  .dark .mauticform-textarea,
-  .dark .mauticform-selectbox {
-    border-color: rgb(255 255 255 / 0.15) !important;
+    transition: all 0.2s ease-in-out !important;
   }
   .mauticform-input:focus,
   .mauticform-textarea:focus {
-    outline: 2px solid rgb(0 0 0 / 0.3) !important;
-    outline-offset: 0px !important;
-    border-color: transparent !important;
-  }
-  .dark .mauticform-input:focus,
-  .dark .mauticform-textarea:focus {
-    outline-color: rgb(255 255 255 / 0.4) !important;
+    outline: none !important;
+    border-color: #0aa8a7 !important; /* primary color */
+    box-shadow: 0 0 0 3px rgba(10, 168, 167, 0.15) !important;
   }
   .mauticform-label {
-    font-size: 0.8rem !important;
+    font-size: 0.85rem !important;
     font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    margin-bottom: 0.375rem !important;
+    color: #222 !important;
+    margin-bottom: 0.5rem !important;
     display: block !important;
-    opacity: 0.75;
   }
   .mauticform-row { margin-bottom: 1.25rem !important; }
   .mauticform-button-wrapper { margin-top: 0.5rem !important; }
   .mauticform-button {
-    background: black !important;
+    background: #0aa8a7 !important; /* primary button color */
     color: white !important;
     border: none !important;
-    padding: 0.5rem 1.25rem !important;
-    border-radius: 0.375rem !important;
-    font-size: 0.875rem !important;
+    padding: 0.75rem 1.75rem !important;
+    border-radius: 9999px !important; /* Pill style */
+    font-size: 0.95rem !important;
     font-weight: 600 !important;
     cursor: pointer !important;
-    transition: opacity 0.2s !important;
+    transition: all 0.2s ease !important;
     font-family: inherit !important;
+    box-shadow: 0 4px 6px -1px rgba(10, 168, 167, 0.2), 0 2px 4px -1px rgba(10, 168, 167, 0.1) !important;
   }
-  .dark .mauticform-button {
-    background: white !important;
-    color: black !important;
+  .mauticform-button:hover { 
+    opacity: 0.95 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 10px 15px -3px rgba(10, 168, 167, 0.3), 0 4px 6px -4px rgba(10, 168, 167, 0.3) !important;
   }
-  .mauticform-button:hover { opacity: 0.75 !important; }
-  .mauticform-message { color: #16a34a !important; font-weight: 600 !important; margin-bottom: 1rem !important; }
+  .mauticform-message { 
+    color: #0aa8a7 !important; 
+    font-weight: 600 !important; 
+    margin-bottom: 1rem !important; 
+    padding: 1rem !important;
+    background: #edf6f5 !important;
+    border-radius: 0.75rem !important;
+  }
   .mauticform-error,
-  .mauticform-errormsg { color: #dc2626 !important; font-size: 0.8rem !important; margin-top: 0.25rem !important; }
+  .mauticform-errormsg { 
+    color: #dc2626 !important; 
+    font-size: 0.85rem !important; 
+    margin-top: 0.35rem !important; 
+  }
 </style>

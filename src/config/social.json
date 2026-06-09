@@ -1,0 +1,14 @@
+{
+  "main": [
+    {
+      "name": "email",
+      "icon": "FaEnvelope",
+      "link": "mailto:info@alexander-graf.de"
+    },
+    {
+      "name": "github",
+      "icon": "FaGithub",
+      "link": "https://github.com/alexander-graf"
+    }
+  ]
+}

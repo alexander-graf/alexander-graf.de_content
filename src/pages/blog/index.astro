@@ -1,46 +1,44 @@
 ---
-import { getCollection } from "astro:content";
-import PageLayout from "@layouts/PageLayout.astro";
-import TopLayout from "@layouts/TopLayout.astro";
-import BottomLayout from "@layouts/BottomLayout.astro";
-import SearchCollection from "@components/SearchCollection";
-import { BLOG } from "@consts";
+import config from "@/config/config.json";
+import Base from "@/layouts/Base.astro";
+import BlogSearch from "@/components/BlogSearch";
+import { getSinglePage } from "@/lib/contentParser.astro";
+import { sortByDate } from "@/lib/utils/sortFunctions";
+import type { CollectionEntry } from "astro:content";
+import { getEntry } from "astro:content";
 
-const posts = (await getCollection("blog"))
-  .filter((post) => !post.data.draft)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const { summary_length } = config.settings;
+const postIndex = (await getEntry("blog", "-index")) as CollectionEntry<"blog">;
+const posts = await getSinglePage("blog");
+const sortedPosts = sortByDate(posts);
 
-const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort(
-  (a, b) => a.localeCompare(b),
-);
-
-const estimated_initial_size =
-  28 + posts.length * 158 + (posts.length - 1) * 12;
+// Map posts to a plain serializable structure for React to avoid hydration errors
+const postsForSearch = sortedPosts.map(post => ({
+  id: post.id,
+  body: post.body || "",
+  data: {
+    title: post.data.title,
+    description: post.data.description || "",
+    date: post.data.date ? post.data.date.toISOString() : undefined,
+    image: post.data.image,
+    tags: post.data.tags || [],
+  }
+}));
 ---
 
-<PageLayout title={BLOG.TITLE} description={BLOG.DESCRIPTION}>
-  <TopLayout>
-    <div class="animate">
-      <h1 class="text-3xl font-semibold text-black dark:text-white mt-2">
-        {BLOG.TITLE}
-      </h1>
-      <div class="mt-1">
-        {BLOG.DESCRIPTION}
+<Base title={postIndex?.data.title} description={postIndex?.data.description}>
+  <section class="section">
+    <div class="container">
+      <div class="text-center mb-8">
+        <h1 class="font-semibold lg:text-[56px] mb-4">
+          {postIndex?.data.title || "Blog"}
+        </h1>
+        <p class="text-text/70 max-w-xl mx-auto">
+          {postIndex?.data.description || "Technische Notizen, Anleitungen und Gedanken zu IT-Systemen."}
+        </p>
       </div>
+
+      <BlogSearch client:load posts={postsForSearch} summaryLength={summary_length} />
     </div>
-  </TopLayout>
-  <BottomLayout>
-    <div
-      id="search-collection-wrapper"
-      class="animate"
-      style={{ minHeight: `${estimated_initial_size}px` }}
-    >
-      <SearchCollection
-        client:load
-        entry_name={"posts"}
-        tags={tags}
-        data={posts}
-      />
-    </div>
-  </BottomLayout>
-</PageLayout>
+  </section>
+</Base>

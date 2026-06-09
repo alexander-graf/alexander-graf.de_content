@@ -1,0 +1,40 @@
+{
+  "site": {
+    "title": "Alexander Graf · Privater Blog",
+    "base_url": "https://alexander-graf.de",
+    "base_path": "/",
+    "trailing_slash": false,
+    "favicon": "/favicon.svg",
+    "logo": "/images/logo.png",
+    "logo_width": "200",
+    "logo_height": "38",
+    "logo_text": "Alexander Graf"
+  },
+
+  "settings": {
+    "pagination": 6,
+    "summary_length": 200
+  },
+
+  "nav_button": {
+    "enable": true,
+    "label": "Kontakt",
+    "link": "/kontakt"
+  },
+
+  "params": {
+    "contact_form_action": "#",
+    "footer_content": "Privater Blog und persönliche Vorstellung eines Technik-Enthusiasten aus Lauf a.d. Pegnitz.",
+    "copyright": "© 2026 Alexander Graf."
+  },
+
+  "metadata": {
+    "meta_author": "Alexander Graf",
+    "meta_image": "/images/og-image.png",
+    "meta_description": "Privater Blog und persönliche Vorstellung eines Technik-Enthusiasten aus Lauf a.d. Pegnitz. Mein Notizbuch – technisch, manchmal quer, immer ehrlich."
+  },
+  "google_tag_manager": {
+    "enable": false,
+    "gtm_id": "GTM-XXXXXX"
+  }
+}
