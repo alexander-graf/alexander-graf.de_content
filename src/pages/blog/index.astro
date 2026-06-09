@@ -1,284 +1,46 @@
 ---
-import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
-import Header from '../../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { getCollection } from "astro:content";
+import PageLayout from "@layouts/PageLayout.astro";
+import TopLayout from "@layouts/TopLayout.astro";
+import BottomLayout from "@layouts/BottomLayout.astro";
+import SearchCollection from "@components/SearchCollection";
+import { BLOG } from "@consts";
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+const posts = (await getCollection("blog"))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort(
+  (a, b) => a.localeCompare(b),
 );
 
-const allTags = [...new Set(posts.flatMap((post) => {
-	const tags = post.data.tags;
-	if (Array.isArray(tags)) return tags;
-	if (typeof tags === 'string') return [tags];
-	return [];
-}))].filter(Boolean).sort();
-
-console.log('GEFUNDENE TAGS:', allTags);
-console.log('ANZAHL POSTS:', posts.length);
-
-const tagCounts = allTags.reduce((acc, tag) => {
-	acc[tag] = posts.filter(post => {
-		const tags = post.data.tags;
-		return Array.isArray(tags) ? tags.includes(tag) : tags === tag;
-	}).length;
-	return acc;
-}, {} as Record<string, number>);
+const estimated_initial_size =
+  28 + posts.length * 158 + (posts.length - 1) * 12;
 ---
 
-<!doctype html>
-<html lang="de">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-		<style>
-			main {
-				width: 100%;
-				max-width: 1200px;
-				margin: 0 auto;
-				padding: 2rem;
-				display: grid;
-				grid-template-columns: 250px 1fr;
-				gap: 3rem;
-			}
-			aside {
-				padding-top: 2rem;
-			}
-			.filter-section {
-				position: sticky;
-				top: 2rem;
-				display: flex;
-				flex-direction: column;
-				gap: 0.25rem;
-				background: #f9f9f9;
-				padding: 1.25rem;
-				border-radius: 12px;
-				border: 1px solid #eee;
-			}
-			.tag-checkbox-container {
-				display: flex;
-				align-items: center;
-				position: relative;
-				padding: 6px 8px 6px 35px;
-				cursor: pointer;
-				font-size: 0.95rem;
-				user-select: none;
-				border-radius: 6px;
-				transition: background 0.2s;
-			}
-			.tag-checkbox-container:hover {
-				background: #f0f0f0;
-			}
-			.tag-checkbox-container input {
-				position: absolute;
-				opacity: 0;
-				cursor: pointer;
-				height: 0;
-				width: 0;
-			}
-			.checkmark {
-				position: absolute;
-				top: 50%;
-				left: 8px;
-				transform: translateY(-50%);
-				height: 18px;
-				width: 18px;
-				background-color: #fff;
-				border: 2px solid #ddd;
-				border-radius: 4px;
-				transition: all 0.2s;
-			}
-			.tag-checkbox-container input:checked ~ .checkmark {
-				background-color: var(--accent);
-				border-color: var(--accent);
-			}
-			.checkmark:after {
-				content: "";
-				position: absolute;
-				display: none;
-			}
-			.tag-checkbox-container input:checked ~ .checkmark:after {
-				display: block;
-			}
-			.tag-checkbox-container .checkmark:after {
-				left: 5px;
-				top: 1px;
-				width: 4px;
-				height: 8px;
-				border: solid white;
-				border-width: 0 2px 2px 0;
-				transform: rotate(45deg);
-			}
-			.tag-label {
-				flex-grow: 1;
-				color: var(--black);
-			}
-			.count {
-				font-size: 0.75rem;
-				color: #888;
-				background: #eee;
-				padding: 1px 6px;
-				border-radius: 10px;
-				margin-left: 8px;
-			}
-			.divider {
-				height: 1px;
-				background: #eee;
-				margin: 0.5rem 0;
-			}
-			section {
-				width: 100%;
-			}
-			ul {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2rem;
-				list-style-type: none;
-				margin: 0;
-				padding: 0;
-			}
-			ul li {
-				width: calc(50% - 1rem);
-			}
-			ul li * {
-				text-decoration: none;
-				transition: 0.2s ease;
-			}
-			ul li img {
-				margin-bottom: 0.5rem;
-				border-radius: 12px;
-				width: 100%;
-				height: auto;
-				aspect-ratio: 16/9;
-				object-fit: cover;
-			}
-			ul li a {
-				display: block;
-			}
-			.title {
-				margin: 0;
-				color: rgb(var(--black));
-				line-height: 1.2;
-				font-size: 1.25rem;
-			}
-			.date {
-				margin: 0.5rem 0 0;
-				color: rgb(var(--gray));
-				font-size: 0.9rem;
-			}
-			ul li a:hover h4,
-			ul li a:hover .date {
-				color: rgb(var(--accent));
-			}
-			@media (max-width: 900px) {
-				main {
-					grid-template-columns: 1fr;
-				}
-				aside {
-					order: -1;
-					padding-top: 0;
-				}
-				.tag-list {
-					display: flex;
-					flex-wrap: wrap;
-					gap: 0.5rem;
-					position: static;
-				}
-				ul li {
-					width: 100%;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<aside>
-				<h3>Kategorien</h3>
-				<div class="filter-section">
-					<label class="tag-checkbox-container all-posts">
-						<input type="checkbox" id="check-all" checked />
-						<span class="checkmark"></span>
-						<span class="tag-label">Alle Beiträge</span>
-						<span class="count">{posts.length}</span>
-					</label>
-					<div class="divider"></div>
-					{allTags.map((tag) => (
-						<label class="tag-checkbox-container">
-							<input type="checkbox" class="tag-checkbox" value={tag} />
-							<span class="checkmark"></span>
-							<span class="tag-label">{tag}</span>
-							<span class="count">{tagCounts[tag]}</span>
-						</label>
-					))}
-				</div>
-			</aside>
-			<section>
-				<ul id="post-list">
-					{
-						posts.map((post) => (
-							<li class="post-item" data-tags={JSON.stringify(post.data.tags || [])}>
-								<a href={`/blog/${post.id}/`}>
-									{post.data.heroImage && (
-										<Image width={720} height={360} src={post.data.heroImage} alt="" />
-									)}
-									<h4 class="title">{post.data.title}</h4>
-									<p class="date">
-										<FormattedDate date={post.data.pubDate} />
-									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
-		</main>
-
-		<script>
-			const checkAll = document.getElementById('check-all') as HTMLInputElement;
-			const tagCheckboxes = document.querySelectorAll('.tag-checkbox') as NodeListOf<HTMLInputElement>;
-			const posts = document.querySelectorAll('.post-item') as NodeListOf<HTMLElement>;
-
-			function updateFilter() {
-				const selectedTags = Array.from(tagCheckboxes)
-					.filter(cb => cb.checked)
-					.map(cb => cb.value);
-
-				const showAll = checkAll.checked;
-
-				posts.forEach(post => {
-					const postTags = JSON.parse(post.getAttribute('data-tags') || '[]');
-					
-					if (showAll) {
-						post.style.display = 'block';
-					} else if (selectedTags.length === 0) {
-						post.style.display = 'none'; // Oder 'block' wenn nichts gewählt ist? 'none' ist konsequenter.
-					} else {
-						const hasMatch = selectedTags.some(tag => postTags.includes(tag));
-						post.style.display = hasMatch ? 'block' : 'none';
-					}
-				});
-			}
-
-			checkAll?.addEventListener('change', () => {
-				if (checkAll.checked) {
-					tagCheckboxes.forEach(cb => cb.checked = false);
-				}
-				updateFilter();
-			});
-
-			tagCheckboxes.forEach(cb => {
-				cb.addEventListener('change', () => {
-					if (cb.checked) {
-						checkAll.checked = false;
-					}
-					updateFilter();
-				});
-			});
-		</script>
-		<Footer />
-	</body>
-</html>
+<PageLayout title={BLOG.TITLE} description={BLOG.DESCRIPTION}>
+  <TopLayout>
+    <div class="animate">
+      <h1 class="text-3xl font-semibold text-black dark:text-white mt-2">
+        {BLOG.TITLE}
+      </h1>
+      <div class="mt-1">
+        {BLOG.DESCRIPTION}
+      </div>
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div
+      id="search-collection-wrapper"
+      class="animate"
+      style={{ minHeight: `${estimated_initial_size}px` }}
+    >
+      <SearchCollection
+        client:load
+        entry_name={"posts"}
+        tags={tags}
+        data={posts}
+      />
+    </div>
+  </BottomLayout>
+</PageLayout>

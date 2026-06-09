@@ -1,23 +1,67 @@
 backend:
   name: github
-  repo: alexander-graf/alexander-graf.de_content
+  repo: alexander-graf/alexandergraf.de
   branch: main
-  base_url: https://alexander-graf.de
+  base_url: https://alexandergraf.de
   auth_endpoint: auth
 
-media_folder: "public/assets/blog"
-public_folder: "/assets/blog"
+media_folder: "public/images"
+public_folder: "/images"
+
+slug:
+  encoding: "ascii"
+  clean_accents: true
+  sanitize_replacement: "-"
 
 collections:
   - name: "blog"
     label: "Blog"
+    label_singular: "Blogpost"
     folder: "src/content/blog"
+    path: "{{slug}}/index"
+    extension: "md"
+    format: "frontmatter"
     create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    slug: "{{slug}}"
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Description", name: "description", widget: "string" }
-      - { label: "Publish Date", name: "pubDate", widget: "datetime", format: "MMM DD YYYY" }
-      - { label: "Hero Image", name: "heroImage", widget: "image", default: "../../assets/blog-placeholder-1.jpg" }
-      - { label: "Tags", name: "tags", widget: "list", default: ["Allgemein"] }
-      - { label: "Body", name: "body", widget: "markdown" }
+      - { label: "Titel", name: "title", widget: "string" }
+      - { label: "Datum", name: "date", widget: "datetime" }
+      - { label: "Zusammenfassung", name: "summary", widget: "text" }
+      - { label: "Tags", name: "tags", widget: "list" }
+      - { label: "Entwurf", name: "draft", widget: "boolean", default: false }
+      - { label: "Inhalt", name: "body", widget: "markdown" }
+
+  - name: "projects"
+    label: "Projekte"
+    label_singular: "Projekt"
+    folder: "src/content/projects"
+    path: "{{slug}}/index"
+    extension: "md"
+    format: "frontmatter"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Titel", name: "title", widget: "string" }
+      - { label: "Zusammenfassung", name: "summary", widget: "text" }
+      - { label: "Datum", name: "date", widget: "datetime" }
+      - { label: "Tags", name: "tags", widget: "list" }
+      - { label: "Entwurf", name: "draft", widget: "boolean", default: false }
+      - { label: "Demo-URL", name: "demoUrl", widget: "string", required: false }
+      - { label: "Repo-URL", name: "repoUrl", widget: "string", required: false }
+      - { label: "Inhalt", name: "body", widget: "markdown" }
+
+  - name: "work"
+    label: "Berufliche Stationen"
+    label_singular: "Station"
+    folder: "src/content/work"
+    path: "{{slug}}/index"
+    extension: "md"
+    format: "frontmatter"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Unternehmen", name: "company", widget: "string" }
+      - { label: "Rolle", name: "role", widget: "string" }
+      - { label: "Von", name: "dateStart", widget: "datetime" }
+      - { label: "Bis", name: "dateEnd", widget: "string" }
+      - { label: "Inhalt", name: "body", widget: "markdown" }

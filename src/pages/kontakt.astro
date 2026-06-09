@@ -1,25 +1,104 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import ContactForm from '../components/ContactForm.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+
+const page = {
+  TITLE: "Kontakt",
+  DESCRIPTION: "Schreib mir direkt eine Nachricht.",
+}
 ---
 
-<!doctype html>
-<html lang="de">
-	<head>
-		<BaseHead title={`Kontakt | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>Kontakt</h1>
-			<p>
-				Hast du Fragen oder möchtest ein Projekt besprechen? Schreib mir einfach eine Nachricht über das Formular unten.
-			</p>
-			<ContactForm />
-		</main>
-		<Footer />
-	</body>
-</html>
+<PageLayout title={page.TITLE} description={page.DESCRIPTION}>
+  <TopLayout>
+    <div class="animate page-heading">
+      Kontakt
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div class="animate">
+      <p class="mb-8 opacity-75">
+        Hast du eine Frage, ein Projekt oder willst einfach nur Moin sagen? Schreib mir direkt.
+      </p>
+      <div class="mautic-form-wrapper">
+        <script
+          is:inline
+          src="https://mautic.alexandergraf.de/form/generate.js?id=2"
+          type="text/javascript"
+          charset="utf-8"
+          async
+        ></script>
+        <noscript>
+          <a href="https://mautic.alexandergraf.de/form/2">Zum Kontaktformular</a>
+        </noscript>
+      </div>
+    </div>
+  </BottomLayout>
+</PageLayout>
+
+<style is:global>
+  .mauticform_wrapper {
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+  .mauticform-name { display: none; }
+  .mauticform-input,
+  .mauticform-textarea,
+  .mauticform-selectbox {
+    background: transparent !important;
+    border: 1px solid rgb(0 0 0 / 0.15) !important;
+    border-radius: 0.5rem !important;
+    padding: 0.625rem 0.875rem !important;
+    color: inherit !important;
+    font-size: 0.9rem !important;
+    font-family: inherit !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .dark .mauticform-input,
+  .dark .mauticform-textarea,
+  .dark .mauticform-selectbox {
+    border-color: rgb(255 255 255 / 0.15) !important;
+  }
+  .mauticform-input:focus,
+  .mauticform-textarea:focus {
+    outline: 2px solid rgb(0 0 0 / 0.3) !important;
+    outline-offset: 0px !important;
+    border-color: transparent !important;
+  }
+  .dark .mauticform-input:focus,
+  .dark .mauticform-textarea:focus {
+    outline-color: rgb(255 255 255 / 0.4) !important;
+  }
+  .mauticform-label {
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    margin-bottom: 0.375rem !important;
+    display: block !important;
+    opacity: 0.75;
+  }
+  .mauticform-row { margin-bottom: 1.25rem !important; }
+  .mauticform-button-wrapper { margin-top: 0.5rem !important; }
+  .mauticform-button {
+    background: black !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.5rem 1.25rem !important;
+    border-radius: 0.375rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: opacity 0.2s !important;
+    font-family: inherit !important;
+  }
+  .dark .mauticform-button {
+    background: white !important;
+    color: black !important;
+  }
+  .mauticform-button:hover { opacity: 0.75 !important; }
+  .mauticform-message { color: #16a34a !important; font-weight: 600 !important; margin-bottom: 1rem !important; }
+  .mauticform-error,
+  .mauticform-errormsg { color: #dc2626 !important; font-size: 0.8rem !important; margin-top: 0.25rem !important; }
+</style>
