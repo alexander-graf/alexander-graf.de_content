@@ -3,9 +3,17 @@ import { markdownify } from "@/lib/utils/textConverter";
 import { Image } from "astro:assets";
 import { render } from "astro:content";
 
-const { post } = Astro.props;
+const { post, allPosts = [] } = Astro.props;
 const { Content } = await render(post);
 const { title, image } = post.data;
+
+const postUrls = allPosts
+  .filter((p) => p.id !== post.id)
+  .map((p) => `/blog/${p.id}/`);
+
+const staticRandomUrl = postUrls.length > 0 
+  ? postUrls[Math.floor(Math.random() * postUrls.length)]
+  : "/blog/";
 ---
 
 <section class="section">
@@ -29,6 +37,43 @@ const { title, image } = post.data;
           <div class="content mb-16 text-left">
             <Content />
           </div>
+
+          <!-- Weiter zum nächsten Artikel -->
+          <div class="mt-16 border-t border-border pt-12 text-center">
+            <p class="text-text/70 mb-4 text-sm">Fertig mit Lesen?</p>
+            <a href={staticRandomUrl} class="btn btn-outline-primary random-post-link inline-flex items-center">
+              Weiter zum nächsten Artikel
+              <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+          </div>
+
+          <script is:inline define:vars={{ postUrls }}>
+            function setupRandomLinks() {
+              const links = document.querySelectorAll('.random-post-link');
+              if (links.length > 0) {
+                const currentPath = window.location.pathname;
+                const filteredUrls = postUrls.filter(url => {
+                  const normUrl = url.replace(/\/$/, "");
+                  const normPath = currentPath.replace(/\/$/, "");
+                  return normUrl !== normPath && normUrl !== normPath + "/index.html";
+                });
+                if (filteredUrls.length > 0) {
+                  const randomUrl = filteredUrls[Math.floor(Math.random() * filteredUrls.length)];
+                  links.forEach(link => {
+                    link.href = randomUrl;
+                  });
+                }
+              }
+            }
+
+            // Initial setup
+            setupRandomLinks();
+
+            // Run when page loads via client router
+            document.addEventListener("astro:page-load", setupRandomLinks);
+          </script>
         </article>
       </div>
     </div>
