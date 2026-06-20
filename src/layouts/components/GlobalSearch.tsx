@@ -118,13 +118,17 @@ export default function GlobalSearch({ posts, pages }: Props) {
       setSelectedIndex(prev => Math.max(prev - 1, 0));
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (displayedResults.length === 1) {
+      if (selectedIndex >= 0 && selectedIndex < displayedResults.length) {
+        // If arrow-selected, navigate to that item
+        window.location.href = displayedResults[selectedIndex].url;
+        setIsOpen(false);
+      } else if (displayedResults.length === 1) {
         // If exactly 1 result, navigate immediately
         window.location.href = displayedResults[0].url;
         setIsOpen(false);
-      } else if (selectedIndex >= 0 && selectedIndex < displayedResults.length) {
-        // If arrow-selected, navigate to that item
-        window.location.href = displayedResults[selectedIndex].url;
+      } else if (searchQuery.trim()) {
+        // If multiple results, navigate to the blog search results page
+        window.location.href = `/blog/?q=${encodeURIComponent(searchQuery.trim())}`;
         setIsOpen(false);
       }
     }

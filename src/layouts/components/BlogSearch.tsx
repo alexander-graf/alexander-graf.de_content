@@ -26,6 +26,17 @@ export default function BlogSearch({ posts, summaryLength }: Props) {
   const [showDrawer, setShowDrawer] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Check URL search parameters on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get('q');
+      if (q) {
+        setQuery(q);
+      }
+    }
+  }, []);
+
   // Extract all unique tags
   const tags = useMemo(() => {
     const allTags = posts.flatMap(p => p.data.tags || []);
