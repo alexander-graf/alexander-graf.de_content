@@ -16,7 +16,7 @@ jobs:
 
       - name: Sync Environment Variables
         run: |
-          cp /home/admin/gemini/projekte/alexander-graf.de/.env .env
+          cp /home/admin/gemini/projekte/alexandergraf.de/.env .env
 
       - name: Deploy with Docker Compose
         run: |
