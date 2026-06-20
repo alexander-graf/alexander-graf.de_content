@@ -16,11 +16,36 @@ interface Props {
   pages: SearchItem[];
 }
 
+const INITIAL_VISIBLE_COUNT = 10;
+const LOAD_MORE_COUNT = 10;
+
 export default function GlobalSearch({ posts, pages }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Global hotkey 's' / 'S' to open search
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      const isInput = activeEl && (
+        activeEl.tagName === 'INPUT' || 
+        activeEl.tagName === 'TEXTAREA' || 
+        activeEl.getAttribute('contenteditable') === 'true'
+      );
+      if (isInput) return;
+
+      if (e.key === 's' || e.key === 'S') {
+        e.preventDefault();
+        setIsOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   // Shuffle suggestions once when modal opens
   useEffect(() => {
@@ -32,6 +57,8 @@ export default function GlobalSearch({ posts, pages }: Props) {
       const shuffled = merged.sort(() => 0.5 - Math.random()).slice(0, 5);
       setSuggestions(shuffled);
       setSearchQuery('');
+      setVisibleCount(INITIAL_VISIBLE_COUNT);
+      setSelectedIndex(-1);
     }
   }, [isOpen, posts]);
 
@@ -55,6 +82,12 @@ export default function GlobalSearch({ posts, pages }: Props) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Reset limit and selected index when query changes
+  useEffect(() => {
+    setVisibleCount(INITIAL_VISIBLE_COUNT);
+    setSelectedIndex(-1);
+  }, [searchQuery]);
+
   // Search filter logic
   const results = useMemo(() => {
     if (!searchQuery) return [];
@@ -70,6 +103,42 @@ export default function GlobalSearch({ posts, pages }: Props) {
       );
     });
   }, [searchQuery, posts, pages]);
+
+  const displayedResults = useMemo(() => {
+    return results.slice(0, visibleCount);
+  }, [results, visibleCount]);
+
+  // Keyboard navigation & enter handling
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(prev => Math.min(prev + 1, displayedResults.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(prev => Math.max(prev - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (displayedResults.length === 1) {
+        // If exactly 1 result, navigate immediately
+        window.location.href = displayedResults[0].url;
+        setIsOpen(false);
+      } else if (selectedIndex >= 0 && selectedIndex < displayedResults.length) {
+        // If arrow-selected, navigate to that item
+        window.location.href = displayedResults[selectedIndex].url;
+        setIsOpen(false);
+      }
+    }
+  };
+
+  // Infinite Scroll scroll handler
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    if (target.scrollHeight - target.scrollTop - target.clientHeight < 60) {
+      if (visibleCount < results.length) {
+        setVisibleCount(prev => Math.min(prev + LOAD_MORE_COUNT, results.length));
+      }
+    }
+  };
 
   return (
     <>
@@ -103,6 +172,7 @@ export default function GlobalSearch({ posts, pages }: Props) {
                 placeholder="Beiträge und Seiten durchsuchen..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleInputKeyDown}
               />
               {searchQuery && (
                 <button 
@@ -121,7 +191,7 @@ export default function GlobalSearch({ posts, pages }: Props) {
             </div>
 
             {/* Content Area */}
-            <div className="flex-grow overflow-y-auto p-6">
+            <div className="flex-grow overflow-y-auto p-6" onScroll={handleScroll}>
               {searchQuery === '' ? (
                 <div>
                   <span className="text-xs font-bold text-text/40 uppercase tracking-wider block mb-3">
@@ -151,32 +221,49 @@ export default function GlobalSearch({ posts, pages }: Props) {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {results.map((item) => (
-                        <a
-                          key={`${item.type}-${item.id}`}
-                          href={item.url}
-                          className="block p-4 bg-light/30 hover:bg-primary/5 border border-border hover:border-primary/25 rounded-xl transition-all"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <div className="flex items-center justify-between gap-3 mb-1">
-                            <h4 className="font-semibold text-text-dark hover:text-primary transition-colors text-base">
-                              {item.title}
-                            </h4>
-                            <span className={`px-2 py-0.5 text-[10px] font-bold rounded uppercase ${
-                              item.type === 'blog' 
-                                ? 'bg-primary/10 text-primary' 
-                                : 'bg-text/10 text-text/80'
-                            }`}>
-                              {item.type === 'blog' ? 'Blog' : 'Seite'}
-                            </span>
-                          </div>
-                          {item.description && (
-                            <p className="text-sm text-text/70 line-clamp-2 leading-relaxed">
-                              {item.description}
-                            </p>
-                          )}
-                        </a>
-                      ))}
+                      {displayedResults.map((item, index) => {
+                        const isSelected = index === selectedIndex;
+                        return (
+                          <a
+                            key={`${item.type}-${item.id}`}
+                            href={item.url}
+                            className={`block p-4 border rounded-xl transition-all ${
+                              isSelected 
+                                ? 'bg-primary/10 border-primary text-primary shadow-sm'
+                                : 'bg-light/30 hover:bg-primary/5 border-border hover:border-primary/25'
+                            }`}
+                            onClick={() => setIsOpen(false)}
+                            onMouseEnter={() => setSelectedIndex(index)}
+                          >
+                            <div className="flex items-center justify-between gap-3 mb-1">
+                              <h4 className={`font-semibold transition-colors text-base ${
+                                isSelected ? 'text-primary' : 'text-text-dark hover:text-primary'
+                              }`}>
+                                {item.title}
+                              </h4>
+                              <span className={`px-2 py-0.5 text-[10px] font-bold rounded uppercase ${
+                                item.type === 'blog' 
+                                  ? 'bg-primary/10 text-primary' 
+                                  : 'bg-text/10 text-text/80'
+                              }`}>
+                                {item.type === 'blog' ? 'Blog' : 'Seite'}
+                              </span>
+                            </div>
+                            {item.description && (
+                              <p className={`text-sm leading-relaxed line-clamp-2 ${
+                                isSelected ? 'text-primary/80' : 'text-text/70'
+                              }`}>
+                                {item.description}
+                              </p>
+                            )}
+                          </a>
+                        );
+                      })}
+                      {visibleCount < results.length && (
+                        <div className="text-center text-xs text-text/40 py-2">
+                          Lade weitere Ergebnisse...
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

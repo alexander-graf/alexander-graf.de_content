@@ -84,12 +84,11 @@ const pagesForSearch = pages.map(page => ({
       {
         main.map((menu) => (
           <>
-            {menu.name === "Kontakt" && (
+            {menu.name === "Kontakt" ? (
               <li class="nav-item flex items-center justify-center">
                 <GlobalSearch client:load posts={postsForSearch} pages={pagesForSearch} />
               </li>
-            )}
-            {menu.hasChildren ? (
+            ) : menu.hasChildren ? (
               <li class="nav-item nav-dropdown group relative">
                 <span class="nav-link inline-flex items-center">
                   {menu.name}
