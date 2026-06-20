@@ -11,6 +11,7 @@ services:
       - "traefik.http.routers.alex-astro.rule=Host(`${DOMAIN}`)"
       - "traefik.http.routers.alex-astro.entrypoints=websecure"
       - "traefik.http.routers.alex-astro.tls.certresolver=myresolver"
+      - "traefik.http.routers.alex-astro.middlewares=coraza-waf@file"
       - "traefik.http.services.alex-astro.loadbalancer.server.port=80"
 
   cms-auth:
@@ -30,6 +31,7 @@ services:
       - "traefik.http.routers.alex-cms-auth.rule=Host(`${DOMAIN}`) && (PathPrefix(`/auth`) || PathPrefix(`/callback`))"
       - "traefik.http.routers.alex-cms-auth.entrypoints=websecure"
       - "traefik.http.routers.alex-cms-auth.tls.certresolver=myresolver"
+      - "traefik.http.routers.alex-cms-auth.middlewares=coraza-waf@file"
       - "traefik.http.services.alex-cms-auth.loadbalancer.server.port=3000"
 
 networks:
