@@ -1,7 +1,7 @@
 {
   "site": {
     "title": "Alexander Graf · Privater Blog",
-    "base_url": "https://alexander-graf.de",
+    "base_url": "https://alexandergraf.de",
     "base_path": "/",
     "trailing_slash": false,
     "favicon": "/favicon.svg",

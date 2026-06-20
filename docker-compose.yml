@@ -8,10 +8,13 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      - "traefik.http.routers.alex-astro.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.alex-astro.rule=Host(`${DOMAIN}`) || Host(`alexander-graf.de`)"
       - "traefik.http.routers.alex-astro.entrypoints=websecure"
       - "traefik.http.routers.alex-astro.tls.certresolver=myresolver"
-      - "traefik.http.routers.alex-astro.middlewares=coraza-waf@file"
+      - "traefik.http.middlewares.alex-redirect.redirectregex.regex=^https://alexander-graf\\.de/(.*)"
+      - "traefik.http.middlewares.alex-redirect.redirectregex.replacement=https://alexandergraf.de/$$1"
+      - "traefik.http.middlewares.alex-redirect.redirectregex.permanent=true"
+      - "traefik.http.routers.alex-astro.middlewares=coraza-waf@file,alex-redirect"
       - "traefik.http.services.alex-astro.loadbalancer.server.port=80"
 
   cms-auth:
@@ -28,10 +31,10 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      - "traefik.http.routers.alex-cms-auth.rule=Host(`${DOMAIN}`) && (PathPrefix(`/auth`) || PathPrefix(`/callback`))"
+      - "traefik.http.routers.alex-cms-auth.rule=(Host(`${DOMAIN}`) || Host(`alexander-graf.de`)) && (PathPrefix(`/auth`) || PathPrefix(`/callback`))"
       - "traefik.http.routers.alex-cms-auth.entrypoints=websecure"
       - "traefik.http.routers.alex-cms-auth.tls.certresolver=myresolver"
-      - "traefik.http.routers.alex-cms-auth.middlewares=coraza-waf@file"
+      - "traefik.http.routers.alex-cms-auth.middlewares=coraza-waf@file,alex-redirect"
       - "traefik.http.services.alex-cms-auth.loadbalancer.server.port=3000"
 
 networks:
