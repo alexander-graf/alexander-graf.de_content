@@ -37,6 +37,18 @@ export default function BlogSearch({ posts, summaryLength }: Props) {
     }
   }, []);
 
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  // Generate suggestions once on mount
+  useEffect(() => {
+    const allTags = posts.flatMap(p => p.data.tags || []);
+    const uniqueTags = [...new Set(allTags)].filter(t => t.toLowerCase() !== 'others');
+    const defaultList = ['Docker', 'Mautic', 'Traefik', 'Newsletter', 'Linux', 'Vhost', 'Gewinde'];
+    const merged = [...new Set([...uniqueTags, ...defaultList])];
+    const shuffled = merged.sort(() => 0.5 - Math.random()).slice(0, 5);
+    setSuggestions(shuffled);
+  }, [posts]);
+
   // Extract all unique tags
   const tags = useMemo(() => {
     const allTags = posts.flatMap(p => p.data.tags || []);
@@ -136,6 +148,26 @@ export default function BlogSearch({ posts, summaryLength }: Props) {
           )}
         </button>
       </div>
+
+      {/* Search Suggestions */}
+      {query === '' && (
+        <div className="mt-2 mb-6 bg-light/35 p-4 rounded-xl border border-border">
+          <span className="text-xs font-bold text-text/40 uppercase tracking-wider block mb-3">
+            Besucher suchten auch:
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {suggestions.map((suggestion) => (
+              <button
+                key={suggestion}
+                onClick={() => setQuery(suggestion)}
+                className="px-3.5 py-1.5 bg-white hover:bg-primary/10 hover:text-primary rounded-xl text-sm border border-border font-medium transition-colors cursor-pointer text-text"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Categories Semi-Modal / Drawer */}
       {showDrawer && (
