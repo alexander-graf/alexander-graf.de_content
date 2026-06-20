@@ -28,6 +28,35 @@ const { title, description, info } = entry.data;
               <noscript>
                 <a href="https://mautic.alexandergraf.de/form/2" class="btn btn-primary">Zum Kontaktformular</a>
               </noscript>
+
+              <script is:inline>
+                (function() {
+                  var tokenAdded = false;
+                  function addToken() {
+                    if (tokenAdded) return;
+                    var form = document.getElementById('mauticform_kontaktformularalexandergrafde');
+                    if (form) {
+                      var action = form.getAttribute('action');
+                      if (action && action.indexOf('token=') === -1) {
+                        var separator = action.indexOf('?') !== -1 ? '&' : '?';
+                        form.setAttribute('action', action + separator + 'token=alex-secure-token-9988');
+                        tokenAdded = true;
+                        cleanup();
+                      }
+                    }
+                  }
+                  function cleanup() {
+                    window.removeEventListener('mousemove', addToken);
+                    window.removeEventListener('keydown', addToken);
+                    window.removeEventListener('scroll', addToken);
+                    window.removeEventListener('touchstart', addToken);
+                  }
+                  window.addEventListener('mousemove', addToken);
+                  window.addEventListener('keydown', addToken);
+                  window.addEventListener('scroll', addToken);
+                  window.addEventListener('touchstart', addToken);
+                })();
+              </script>
             </div>
           </div>
         </div>
