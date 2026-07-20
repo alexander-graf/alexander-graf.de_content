@@ -52,6 +52,33 @@ Die Verarbeitung dieser Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSG
 
 ---
 
+### 3. Analyse-Tools und Tracking
+
+#### Mautic (Marketing Automation)
+Wir nutzen auf dieser Website die Marketing-Automation-Software Mautic. Mautic ist eine Open-Source-Lösung, die wir selbst auf unserem eigenen Server hosten (https://mautic.alexandergraf.de). Es findet keine Weitergabe von Daten an Server von Dritten statt.
+* **Einwilligung:** Die Erfassung und Auswertung der Daten erfolgt ausschließlich, wenn Sie uns über den Cookie-Banner Ihre aktive Einwilligung erteilt haben (Art. 6 Abs. 1 lit. a DSGVO).
+* **Zweck:** Mautic hilft uns, die Nutzung unserer Website zu verstehen, das Informationsangebot zu optimieren und Ihnen personalisierte Inhalte bereitzustellen. Hierbei werden Daten wie besuchte Seiten, Verweildauer und Interaktionen erfasst.
+* **Widerruf:** Sie können Ihre Einwilligung jederzeit für die Zukunft widerrufen, indem Sie unten links auf das **Zahnrad-Symbol** klicken und die Cookie-Einstellungen ändern.
+
+#### Matomo (Webanalyse - in Vorbereitung)
+Wir bereiten den Einsatz des Webanalysedienstes Matomo auf unserer Website vor. Auch Matomo ist eine Open-Source-Software, die wir selbst auf unserem eigenen Server hosten werden (https://matomo.alexandergraf.de). 
+* **Einwilligung:** Sobald aktiv, werden Analyse-Cookies von Matomo erst nach Ihrer ausdrücklichen Einwilligung gesetzt (Art. 6 Abs. 1 lit. a DSGVO).
+* **Widerruf:** Auch hierfür können Sie die Einstellungen jederzeit über das **Zahnrad-Symbol** unten links anpassen.
+
+#### Ratatosk (Newsletter & Formular-Tracking)
+Wir nutzen auf dieser Website die Formular- und Newsletter-Management-Software Ratatosk. Ratatosk ist eine Open-Source-Lösung, die wir selbst auf unserem eigenen Server hosten (https://ratatosk.alexandergraf.de).
+* **Einwilligung:** Die Erfassung, Speicherung und Auswertung der Daten (z. B. aufgerufene Seiten, Klicks oder Formularübermittlungen) erfolgt ausschließlich, wenn Sie uns über den Cookie-Banner Ihre aktive Einwilligung erteilt haben (Art. 6 Abs. 1 lit. a DSGVO).
+* **Zweck:** Ratatosk hilft uns, Formular-Interaktionen und Besucheraktivitäten zu analysieren, um Newsletter-Anmeldungen zu verwalten und Spam (z. B. über Cloudflare Turnstile) abzuwehren.
+* **Widerruf:** Sie können Ihre Einwilligung jederzeit für die Zukunft widerrufen, indem Sie unten links auf das **Zahnrad-Symbol** klicken und die Cookie-Einstellungen ändern.
+
+#### Anonyme lokale Server-Statistiken (Cookie-frei)
+Um die Reichweite unseres Blogs stabil, datenschutzfreundlich und unabhängig von Drittanbietern oder AdBlockern zu messen, werten wir die verschlüsselten Server-Logfiles unseres Proxys aus.
+* **Anonymisierung:** Die IP-Adresse des Besuchers wird zusammen mit dem User-Agent unmittelbar in einen kryptografischen Hashwert umgewandelt (SHA-256). Es ist für uns technisch unmöglich, aus diesem Hashwert Rückschlüsse auf Ihre echte IP-Adresse oder Ihre Person zu ziehen. 
+* **Verarbeitung:** Wir zählen anhand dieser anonymen Hashes lediglich die täglichen Besucherzahlen und die aufgerufenen Seiten. Es werden dabei **keine Cookies** auf Ihrem Gerät gespeichert und keine Profile gebildet.
+* **Rechtsgrundlage:** Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse). Unser berechtigtes Interesse liegt in der bedarfsgerechten Gestaltung, der statistischen Auswertung und der IT-Sicherheit unseres Webauftritts.
+
+---
+
 ## Teil 2: Datenschutzerklärung für unsere Play Store App
 
 Diese Datenschutzerklärung gilt für die von uns im Google Play Store angebotene mobile App ("App").

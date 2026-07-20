@@ -23,3 +23,8 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 actions-runner/
+
+# local secrets & generated logs
+scripts/stats_config.json
+scripts/*.log
+git_pull.log

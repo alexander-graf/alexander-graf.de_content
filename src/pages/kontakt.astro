@@ -19,46 +19,135 @@ const { title, description, info } = entry.data;
         <!-- Form Section -->
         <div class="col-12 md:col-6 lg:col-7 mb-8 md:mb-0">
           <div class="bg-white p-6 md:p-8 rounded-2xl border border-border shadow-sm">
-            <div class="mautic-form-wrapper">
-              <script
-                is:inline
-                type="text/javascript"
-                src="https://mautic.alexandergraf.de/form/generate.js?id=2"
-              ></script>
-              <noscript>
-                <a href="https://mautic.alexandergraf.de/form/2" class="btn btn-primary">Zum Kontaktformular</a>
-              </noscript>
+            <!-- Form Tabs -->
+            <div class="flex border-b border-border mb-6">
+              <button
+                id="tab-btn-mautic"
+                class="pb-2 px-4 font-semibold text-sm border-b-2 border-primary text-primary transition-all focus:outline-none cursor-pointer"
+                type="button"
+              >
+                Mautic Formular
+              </button>
+              <button
+                id="tab-btn-ratatosk"
+                class="pb-2 px-4 font-semibold text-sm border-b-2 border-transparent text-text/60 hover:text-text transition-all focus:outline-none cursor-pointer"
+                type="button"
+              >
+                Ratatosk Formular (Beta)
+              </button>
+              <button
+                id="tab-btn-newsletter"
+                class="pb-2 px-4 font-semibold text-sm border-b-2 border-transparent text-text/60 hover:text-text transition-all focus:outline-none cursor-pointer"
+                type="button"
+              >
+                Newsletter
+              </button>
+            </div>
 
-              <script is:inline>
-                (function() {
-                  var tokenAdded = false;
-                  function addToken() {
-                    if (tokenAdded) return;
-                    var form = document.getElementById('mauticform_kontaktformularalexandergrafde');
-                    if (form) {
-                      var action = form.getAttribute('action');
-                      if (action && action.indexOf('token=') === -1) {
-                        var separator = action.indexOf('?') !== -1 ? '&' : '?';
-                        form.setAttribute('action', action + separator + 'token=alex-secure-token-9988');
-                        tokenAdded = true;
-                        cleanup();
+            <!-- Tab Content: Mautic -->
+            <div id="tab-content-mautic" style="display: block;">
+              <div class="mautic-form-wrapper">
+                <script
+                  is:inline
+                  type="text/javascript"
+                  src="https://mautic.alexandergraf.de/form/generate.js?id=2"
+                ></script>
+                <noscript>
+                  <a href="https://mautic.alexandergraf.de/form/2" class="btn btn-primary">Zum Kontaktformular</a>
+                </noscript>
+
+                <script is:inline>
+                  (function() {
+                    var tokenAdded = false;
+                    function addToken() {
+                      if (tokenAdded) return;
+                      var form = document.getElementById('mauticform_kontaktformularalexandergrafde');
+                      if (form) {
+                        var action = form.getAttribute('action');
+                        if (action && action.indexOf('token=') === -1) {
+                          var separator = action.indexOf('?') !== -1 ? '&' : '?';
+                          form.setAttribute('action', action + separator + 'token=alex-secure-token-9988');
+                          tokenAdded = true;
+                          cleanup();
+                        }
                       }
                     }
-                  }
-                  function cleanup() {
-                    window.removeEventListener('mousemove', addToken);
-                    window.removeEventListener('keydown', addToken);
-                    window.removeEventListener('scroll', addToken);
-                    window.removeEventListener('touchstart', addToken);
-                  }
-                  window.addEventListener('mousemove', addToken);
-                  window.addEventListener('keydown', addToken);
-                  window.addEventListener('scroll', addToken);
-                  window.addEventListener('touchstart', addToken);
-                })();
-              </script>
+                    function cleanup() {
+                      window.removeEventListener('mousemove', addToken);
+                      window.removeEventListener('keydown', addToken);
+                      window.removeEventListener('scroll', addToken);
+                      window.removeEventListener('touchstart', addToken);
+                    }
+                    window.addEventListener('mousemove', addToken);
+                    window.addEventListener('keydown', addToken);
+                    window.addEventListener('scroll', addToken);
+                    window.addEventListener('touchstart', addToken);
+                  })();
+                </script>
+              </div>
+            </div>
+
+            <!-- Tab Content: Ratatosk (Kontakt) -->
+            <div id="tab-content-ratatosk" style="display: none;">
+              <div class="ratatosk-form-wrapper flex justify-center">
+                <iframe
+                  src="https://ratatosk.alexandergraf.de/f/21f69879-51c9-4a1f-b841-b252929e6ed3"
+                  style="width:100%;max-width:460px;height:520px;border:0"
+                  loading="lazy"
+                ></iframe>
+              </div>
+            </div>
+
+            <!-- Tab Content: Newsletter -->
+            <div id="tab-content-newsletter" style="display: none;">
+              <div class="ratatosk-form-wrapper flex justify-center">
+                <iframe
+                  src="https://ratatosk.alexandergraf.de/f/8040a9f7-ed7e-4ed0-83d1-22efed2cac34"
+                  style="width:100%;max-width:460px;height:480px;border:0"
+                  loading="lazy"
+                ></iframe>
+              </div>
             </div>
           </div>
+
+          <!-- Tabs Script -->
+          <script is:inline>
+            (function() {
+              function initTabs() {
+                const tabs = [
+                  { btnId: 'tab-btn-mautic', contentId: 'tab-content-mautic' },
+                  { btnId: 'tab-btn-ratatosk', contentId: 'tab-content-ratatosk' },
+                  { btnId: 'tab-btn-newsletter', contentId: 'tab-content-newsletter' }
+                ];
+
+                const resolvedTabs = tabs.map(t => ({
+                  btn: document.getElementById(t.btnId),
+                  content: document.getElementById(t.contentId)
+                })).filter(t => t.btn && t.content);
+
+                resolvedTabs.forEach(activeTab => {
+                  activeTab.btn.addEventListener('click', () => {
+                    resolvedTabs.forEach(t => {
+                      if (t === activeTab) {
+                        t.btn.classList.add('border-primary', 'text-primary');
+                        t.btn.classList.remove('border-transparent', 'text-text/60');
+                        t.content.style.display = 'block';
+                      } else {
+                        t.btn.classList.remove('border-primary', 'text-primary');
+                        t.btn.classList.add('border-transparent', 'text-text/60');
+                        t.content.style.display = 'none';
+                      }
+                    });
+                  });
+                });
+              }
+
+              // Initialisieren
+              initTabs();
+              // Falls Astro View Transitions verwendet werden, lauschen wir auf Seitennavigation
+              document.addEventListener('astro:page-load', initTabs);
+            })();
+          </script>
         </div>
         
         <!-- Info Section -->

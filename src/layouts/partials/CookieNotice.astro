@@ -1,0 +1,189 @@
+---
+---
+
+<div
+  id="cookie-consent"
+  class="fixed bottom-8 left-8 z-[200] max-w-sm bg-white rounded-[2.5rem] shadow-[0_30px_60px_-12px_rgba(0,0,0,0.25)] p-8 border border-gray-100 transform translate-y-20 opacity-0 transition-all duration-700 hidden"
+>
+  <div class="flex items-center gap-4 mb-6">
+    <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+        <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"></path>
+        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path>
+      </svg>
+    </div>
+    <h3 class="font-black text-xl tracking-tight text-gray-900">Privacy Settings</h3>
+  </div>
+  <p class="text-sm text-gray-500 font-medium leading-relaxed mb-6">
+    Wir setzen Marketing- und Tracking-Cookies (Matomo, Mautic & Ratatosk) ein — nur mit Ihrer Zustimmung. Weitere Details in unserer <a href="/datenschutz" class="text-primary hover:underline font-bold">Datenschutzerklärung</a>.
+  </p>
+  
+  <div class="mb-6 p-3 bg-gray-50 rounded-xl text-xs font-semibold text-gray-600 flex justify-between items-center">
+    <span>Aktueller Status:</span>
+    <span id="consent-status-badge" class="px-2 py-0.5 rounded-full bg-neutral-200 text-neutral-800">Unentschieden</span>
+  </div>
+
+  <div class="flex flex-col gap-3">
+    <button
+      id="consent-accept"
+      class="w-full bg-gray-900 text-white font-black py-4 rounded-2xl hover:bg-primary transition-all text-sm uppercase tracking-widest cursor-pointer"
+    >
+      Alle akzeptieren
+    </button>
+    <button
+      id="consent-minimal"
+      class="w-full border-2 border-gray-100 text-gray-500 font-bold py-3.5 rounded-2xl hover:border-gray-200 transition-all text-xs uppercase tracking-widest cursor-pointer"
+    >
+      Ohne Tracking fortfahren
+    </button>
+  </div>
+</div>
+
+<button
+  id="privacy-trigger"
+  class="fixed bottom-8 left-8 z-[190] w-12 h-12 bg-white rounded-full shadow-2xl border border-gray-100 flex items-center justify-center text-gray-300 hover:text-primary transition-all group opacity-0 scale-50 pointer-events-none cursor-pointer"
+  aria-label="Privacy Settings"
+>
+  <svg class="w-6 h-6 group-hover:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15a3 3 0 100-6 3 3 0 000 6z"></path>
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path>
+  </svg>
+</button>
+
+<script is:inline>
+  const STORAGE_KEY = 'alexandergraf_consent';
+
+  function initTracking(all) {
+    if (!all) return;
+    
+    // Mautic Tracking
+    if (!window.MauticTrackingObject) {
+      (function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
+        w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
+        m=d.getElementsByTagName(t)[0];a.async=1;a.src=u;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://mautic.alexandergraf.de/mtc.js','mt');
+    }
+    
+    if (window.mt) {
+      window.mt('send', 'pageview');
+    }
+
+    // Ratatosk Tracking
+    if (!window.RatatoskTrackingObject) {
+      window.RatatoskTrackingObject = true;
+      const a = document.createElement('script');
+      a.async = 1;
+      a.src = 'https://ratatosk.alexandergraf.de/t/rt.js';
+      const m = document.getElementsByTagName('script')[0];
+      if (m && m.parentNode) {
+        m.parentNode.insertBefore(a, m);
+      } else {
+        document.head.appendChild(a);
+      }
+    }
+
+    // Matomo Tracking
+    if (!window.MatomoTrackingObject) {
+      window.MatomoTrackingObject = true;
+      window._paq = window._paq || [];
+      window._paq.push(['trackPageView']);
+      window._paq.push(['enableLinkTracking']);
+      (function() {
+        var u="//matomo.alexandergraf.de/";
+        window._paq.push(['setTrackerUrl', u+'matomo.php']);
+        window._paq.push(['setSiteId', '1']);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+      })();
+    } else {
+      if (window._paq) {
+        window._paq.push(['setCustomUrl', window.location.href]);
+        window._paq.push(['setDocumentTitle', document.title]);
+        window._paq.push(['trackPageView']);
+      }
+    }
+  }
+
+  function updateStatusBadge() {
+    const badge = document.getElementById('consent-status-badge');
+    if (!badge) return;
+    const consent = localStorage.getItem(STORAGE_KEY);
+    if (consent === 'all') {
+      badge.textContent = 'Zustimmung erteilt';
+      badge.className = 'px-2 py-0.5 rounded-full bg-green-100 text-green-800';
+    } else if (consent === 'minimal') {
+      badge.textContent = 'Abgelehnt (kein Tracking)';
+      badge.className = 'px-2 py-0.5 rounded-full bg-red-100 text-red-800';
+    } else {
+      badge.textContent = 'Unentschieden';
+      badge.className = 'px-2 py-0.5 rounded-full bg-neutral-200 text-neutral-800';
+    }
+  }
+
+  function setupCookieConsent() {
+    const banner = document.getElementById('cookie-consent');
+    const trigger = document.getElementById('privacy-trigger');
+    const acceptBtn = document.getElementById('consent-accept');
+    const minimalBtn = document.getElementById('consent-minimal');
+
+    if (!banner || !trigger) return;
+
+    function showBanner() {
+      updateStatusBadge();
+      banner.classList.remove('hidden');
+      setTimeout(() => {
+        banner.classList.remove('translate-y-20', 'opacity-0');
+      }, 100);
+      trigger.classList.add('opacity-0', 'scale-50', 'pointer-events-none');
+    }
+
+    function hideBanner() {
+      banner.classList.add('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        banner.classList.add('hidden');
+        trigger.classList.remove('opacity-0', 'scale-50', 'pointer-events-none');
+      }, 700);
+    }
+
+    const consent = localStorage.getItem(STORAGE_KEY);
+    updateStatusBadge();
+    if (!consent) {
+      showBanner();
+    } else {
+      trigger.classList.remove('opacity-0', 'scale-50', 'pointer-events-none');
+      if (consent === 'all') {
+        initTracking(true);
+      }
+    }
+
+    acceptBtn?.addEventListener('click', () => {
+      localStorage.setItem(STORAGE_KEY, 'all');
+      initTracking(true);
+      updateStatusBadge();
+      hideBanner();
+    });
+
+    minimalBtn?.addEventListener('click', () => {
+      localStorage.setItem(STORAGE_KEY, 'minimal');
+      updateStatusBadge();
+      hideBanner();
+    });
+
+    trigger?.addEventListener('click', showBanner);
+  }
+
+  // Setup on initial document load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupCookieConsent);
+  } else {
+    setupCookieConsent();
+  }
+
+  // Handle Astro page transitions (ClientRouter)
+  document.addEventListener('astro:page-load', () => {
+    setupCookieConsent();
+    if (localStorage.getItem(STORAGE_KEY) === 'all') {
+      initTracking(true);
+    }
+  });
+</script>
