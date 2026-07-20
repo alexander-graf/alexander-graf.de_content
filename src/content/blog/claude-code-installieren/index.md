@@ -5,7 +5,10 @@ summary: >-
   ## Zusammenfassung
 
 
-  Claude Code lässt sich auf frischem Windows 10/11 am saubersten so installieren: erst Windows-Version, 64-Bit-System, Node.js 22+ und optional Git for Windows vorbereiten, dann `npm install -g @anthropic-ai/claude-code` aus einer **neuen** PowerShell starten. [youtube](https://www.youtube.com/watch?v=s3jzIklr1UA)
+  Auf **Linux und macOS** genügen in der Regel drei Zeilen: Node.js 22+ prüfen, optional `npm install -g npm@latest`, dann `npm install -g @anthropic-ai/claude-code`. Statt `sudo` bei `EACCES` besser [nvm](https://github.com/nvm-sh/nvm) verwenden.
+
+
+  Auf frischem **Windows 10/11** lohnt sich die Vorbereitung: Skriptausführung per `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` freigeben, Windows-Version und 64-Bit-System prüfen, Node.js 22+ und optional Git for Windows installieren — und den npm-Befehl dann aus einer **neuen** PowerShell starten. [youtube](https://www.youtube.com/watch?v=s3jzIklr1UA)
 
 
   Der wichtigste Nacharbeitsschritt ist der PATH: Für Node.js muss `C:\\Program Files\\nodejs\\` erreichbar sein, und für `claude` gehört `%USERPROFILE%\\.local\\bin` in den Benutzer-PATH; danach Terminal schließen und neu öffnen. [code.claude](https://code.claude.com/docs/en/setup)
@@ -20,9 +23,37 @@ tags:
 draft: false
 ---
 
-# Claude Code auf frischem Windows 10/11 per npm installieren
+# Claude Code per npm installieren — Windows 10/11, Linux und macOS
 
-Diese Anleitung beschreibt eine saubere Installation von Claude Code auf einem **frischen** Windows-10/11-System über npm, mit Fokus auf Vorbereitung, typische Fehlerquellen und ein korrekt gesetztes PATH, damit der eigentliche npm-Befehl möglichst ohne Nacharbeit durchläuft. Claude Code unterstützt Windows 10 ab Version 1809 und Windows 11, benötigt eine Internetverbindung und läuft auf x64- oder ARM64-Systemen mit mindestens 4 GB RAM.
+Diese Anleitung beschreibt eine saubere Installation von Claude Code über npm, mit Fokus auf Vorbereitung, typische Fehlerquellen und ein korrekt gesetztes PATH. Der Schwerpunkt liegt auf **Windows**, weil dort die meiste Nacharbeit anfällt; für **Linux und macOS** gibt es gleich im Anschluss eine Kurzfassung, die in der Regel ohne Umwege durchläuft.
+
+Claude Code unterstützt Windows 10 ab Version 1809 und Windows 11, benötigt eine Internetverbindung und läuft auf x64- oder ARM64-Systemen mit mindestens 4 GB RAM.
+
+> Alle Befehle dieser Anleitung gibt es auch als kompakten Spickzettel auf GitHub: [alexander-graf/claude-code-windows-guide](https://github.com/alexander-graf/claude-code-windows-guide)
+
+## Kurzfassung für Linux und macOS
+
+Auf Unix-Systemen ist die Installation dank nativer Bash-Integration meist unspektakulär:
+
+```bash
+# 1) Node.js (Version 22+) prüfen
+node -v
+npm -v
+
+# 2) Optional: npm aktualisieren — vermeidet lästige Update-Warnungen
+npm install -g npm@latest
+
+# 3) Claude Code global installieren
+npm install -g @anthropic-ai/claude-code
+
+# 4) Prüfen und starten
+claude --version
+claude doctor
+```
+
+Ein Hinweis zu Rechten: Vermeide `sudo npm install -g`. Wenn du dabei auf `EACCES`-Fehler stößt, ist das ein Zeichen dafür, dass npm global in ein Systemverzeichnis schreiben will, für das dein Benutzer keine Rechte hat. Die saubere Lösung ist nicht `sudo`, sondern ein Node-Versionsmanager wie [nvm](https://github.com/nvm-sh/nvm), der Node und die globalen Pakete im Home-Verzeichnis ablegt.
+
+Wenn das durchgelaufen ist, bist du fertig — der Rest dieser Anleitung betrifft Windows.
 
 ## Zielbild
 
@@ -57,7 +88,17 @@ Erwartung:
 - `$env:PROCESSOR_ARCHITECTURE` ist typischerweise `AMD64` oder `ARM64`.
 
 
-### 2. Das richtige Terminal öffnen
+### 2. PowerShell das Ausführen von Skripten erlauben
+
+Windows blockiert standardmäßig das Ausführen von Skripten. Das äußert sich in roten Fehlermeldungen, die wie ein defektes Paket aussehen, aber nur die Ausführungsrichtlinie sind. Einmalig pro Benutzer setzen:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
+```
+
+`RemoteSigned` erlaubt lokale Skripte und verlangt für heruntergeladene eine Signatur — das ist der übliche Kompromiss für Entwicklungsrechner. Der Scope `CurrentUser` kommt ohne Administratorrechte aus.
+
+### 3. Das richtige Terminal öffnen
 
 Für diese Anleitung wird **Windows PowerShell** oder **PowerShell 7** empfohlen, nicht CMD und nicht „Windows PowerShell (x86)“. Die Claude-Dokumentation weist ausdrücklich darauf hin, dass unter Windows je nach Shell unterschiedliche Installationsbefehle gelten und falsche Shells typische Syntaxfehler auslösen.
 
@@ -69,7 +110,7 @@ So erkennst du die richtige Shell:
 - Wenn du versehentlich die x86-Variante gestartet hast, kann Claude Code melden, dass 32-Bit-Windows nicht unterstützt wird, obwohl dein System 64-Bit ist.
 
 
-### 3. Node.js bewusst vorab installieren
+### 4. Node.js bewusst vorab installieren
 
 Für die npm-Installation von Claude Code wird Node.js benötigt. Die offizielle Claude-Code-Dokumentation nennt für die npm-Methode inzwischen **Node.js 22 oder neuer**. Auf älteren Node-Versionen meldet npm zwar oft nur `EBADENGINE`, die Installation kann aber trotzdem durchlaufen; für einen sauberen Ablauf auf einem frischen System sollte direkt eine aktuelle Node-22-oder-neuer-LTS-Version installiert werden.
 
@@ -81,7 +122,7 @@ Vorgehen:
 4. Achte im Setup darauf, dass Node.js in den PATH aufgenommen wird; genau das verhindert später `node is not recognized` oder `npm is not recognized`. Allgemein ist `C:\Program Files\nodejs\` der relevante Standardpfad für Node und npm unter Windows.
 5. Installation abschließen.
 
-### 4. Terminal komplett schließen und neu öffnen
+### 5. Terminal komplett schließen und neu öffnen
 
 Nach einer Node.js-Installation übernimmt ein bereits offenes Terminal neue PATH-Einträge oft noch nicht. Genau deshalb tauchen bei frischen Installationen häufig die Fehler `node is not recognized` oder `npm is not recognized` auf, obwohl Node korrekt installiert wurde. Ein neues Terminalfenster ist deshalb Teil der Vorbereitung und kein optionaler Schritt.
 
@@ -100,7 +141,7 @@ Erwartung:
 - `where.exe node` und `where.exe npm` sollten auf `C:\Program Files\nodejs\...` oder einen anderen gültigen Node-Installationspfad zeigen.
 
 
-### 5. PATH für Node.js manuell kontrollieren
+### 6. PATH für Node.js manuell kontrollieren
 
 Wenn `node` oder `npm` nach der Neuinstallation trotzdem nicht gefunden werden, ist fast immer der PATH unvollständig oder das Terminal wurde nicht neu gestartet. Die Claude-Dokumentation empfiehlt bei PATH-Problemen generell, die Einträge explizit zu prüfen und danach ein neues Terminal zu öffnen.
 
@@ -133,7 +174,7 @@ npm -v
 
 Wenn Node.js an einem anderen Ort installiert wurde, muss **dieser tatsächliche Installationspfad** in den PATH. `where.exe node` hilft beim Gegencheck, sobald Node erreichbar ist.
 
-### 6. Optional, aber sinnvoll: Git for Windows vorbereiten
+### 7. Optional, aber sinnvoll: Git for Windows vorbereiten
 
 Git for Windows ist für die npm-Installation nicht zwingend erforderlich, wird unter Windows aber empfohlen, damit Claude Code zusätzlich Git Bash für Bash-basierte Werkzeuge verwenden kann. Ohne Git for Windows nutzt Claude Code PowerShell als Shell-Tool.
 
@@ -154,7 +195,15 @@ Wenn Git installiert ist, aber Claude Code Git Bash später nicht findet, kann i
 
 ## Saubere npm-Installation
 
-Wenn `node -v` und `npm -v` sauber funktionieren, erst **dann** kommt der eigentliche Installationsschritt. Die offizielle npm-Installation lautet:
+Wenn `node -v` und `npm -v` sauber funktionieren, erst **dann** kommt der eigentliche Installationsschritt.
+
+Optional, aber empfehlenswert: npm vorher selbst aktualisieren. Der mit Node ausgelieferte npm-Stand ist oft älter und meldet sich später mit Update-Hinweisen mitten in der Ausgabe.
+
+```powershell
+npm install -g npm@latest
+```
+
+Die offizielle npm-Installation lautet:
 
 ```powershell
 npm install -g @anthropic-ai/claude-code
@@ -348,11 +397,15 @@ claude doctor
 ## Minimaler Spickzettel
 
 ```powershell
+# 0) Einmalig: Skriptausführung erlauben
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
+
 # 1) Nach Node.js-Installation prüfen
 node -v
 npm -v
 
-# 2) Claude Code global per npm installieren
+# 2) Optional: npm aktualisieren, dann Claude Code global installieren
+npm install -g npm@latest
 npm install -g @anthropic-ai/claude-code
 
 # 3) Falls claude nicht gefunden wird: User-PATH setzen
