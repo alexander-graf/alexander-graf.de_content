@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kontaktformular</title>
+  <style>
+    /* Diese Seite wird per iframe auf /kontakt eingebettet. Als eigenständige
+       Seite lädt Mautics generate.js hier bei jedem (iframe-)Load sauber —
+       anders als bei Astros Client-Navigation, wo das document.write-Skript
+       nicht neu lief und der Tab leer blieb. */
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: transparent;
+      color: #222;
+    }
+    /* Mautic contact form styling integrated with Bigspring Theme */
+    .mauticform_wrapper { max-width: 100% !important; margin: 0 !important; font-family: inherit !important; }
+    .mauticform-name { display: none; }
+    .mauticform-input,
+    .mauticform-textarea,
+    .mauticform-selectbox {
+      background: #fff !important;
+      border: 1px solid #e9e9e9 !important;
+      border-radius: 0.75rem !important;
+      padding: 0.75rem 1rem !important;
+      color: #222 !important;
+      font-size: 0.95rem !important;
+      font-family: inherit !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      transition: all 0.2s ease-in-out !important;
+    }
+    .mauticform-input:focus,
+    .mauticform-textarea:focus {
+      outline: none !important;
+      border-color: #0aa8a7 !important;
+      box-shadow: 0 0 0 3px rgba(10, 168, 167, 0.15) !important;
+    }
+    .mauticform-label {
+      font-size: 0.85rem !important;
+      font-weight: 600 !important;
+      color: #222 !important;
+      margin-bottom: 0.5rem !important;
+      display: block !important;
+    }
+    .mauticform-row { margin-bottom: 1.25rem !important; }
+    .mauticform-button-wrapper { margin-top: 0.5rem !important; }
+    .mauticform-button {
+      background: #0aa8a7 !important;
+      color: white !important;
+      border: none !important;
+      padding: 0.75rem 1.75rem !important;
+      border-radius: 9999px !important;
+      font-size: 0.95rem !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      font-family: inherit !important;
+      box-shadow: 0 4px 6px -1px rgba(10, 168, 167, 0.2), 0 2px 4px -1px rgba(10, 168, 167, 0.1) !important;
+    }
+    .mauticform-button:hover {
+      opacity: 0.95 !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 10px 15px -3px rgba(10, 168, 167, 0.3), 0 4px 6px -4px rgba(10, 168, 167, 0.3) !important;
+    }
+    .mauticform-message {
+      color: #0aa8a7 !important;
+      font-weight: 600 !important;
+      margin-bottom: 1rem !important;
+      border-radius: 0.75rem !important;
+    }
+    .mauticform-message:empty { display: none !important; }
+    .mauticform-message:not(:empty) { padding: 1rem !important; background: #edf6f5 !important; }
+    .mauticform-error,
+    .mauticform-errormsg { color: #dc2626 !important; font-size: 0.85rem !important; margin-top: 0.35rem !important; }
+  </style>
+</head>
+<body>
+  <!-- Parser-blockierendes Skript: document.write in generate.js funktioniert
+       nur beim initialen Seiten-Parse, den ein iframe-Load garantiert. -->
+  <script type="text/javascript" src="https://mautic.alexandergraf.de/form/generate.js?id=2"></script>
+  <noscript>
+    <a href="https://mautic.alexandergraf.de/form/2">Zum Kontaktformular</a>
+  </noscript>
+
+  <script>
+    // Anti-Spam-Token erst nach echter Nutzerinteraktion an die Formular-Action
+    // hängen (Bots bewegen keine Maus/tippen nicht). Die WAF verlangt diesen
+    // Token für /form/submit, sonst 403.
+    (function () {
+      var tokenAdded = false;
+      function addToken() {
+        if (tokenAdded) return;
+        var form = document.getElementById('mauticform_kontaktformularalexandergrafde');
+        if (form) {
+          var action = form.getAttribute('action');
+          if (action && action.indexOf('token=') === -1) {
+            var sep = action.indexOf('?') !== -1 ? '&' : '?';
+            form.setAttribute('action', action + sep + 'token=alex-secure-token-9988');
+            tokenAdded = true;
+            cleanup();
+          }
+        }
+      }
+      function cleanup() {
+        window.removeEventListener('mousemove', addToken);
+        window.removeEventListener('keydown', addToken);
+        window.removeEventListener('scroll', addToken);
+        window.removeEventListener('touchstart', addToken);
+      }
+      window.addEventListener('mousemove', addToken);
+      window.addEventListener('keydown', addToken);
+      window.addEventListener('scroll', addToken);
+      window.addEventListener('touchstart', addToken);
+    })();
+  </script>
+</body>
+</html>
