@@ -171,5 +171,24 @@ const { title, meta_title, description, image, noindex, canonical } =
     </main>
     <Footer />
     <CookieNotice />
+
+    <!--
+      Die Kontaktseite bindet das Mautic-Formular per Skript ein, das
+      document.write nutzt. Bei Astros Client-Navigation (ClientRouter) wird
+      dieses Skript nicht neu ausgeführt, deshalb blieb der Mautic-Tab leer,
+      bis der Nutzer neu lädt. Ein iframe scheidet aus, weil die WAF für die
+      Formular-Übermittlung einen clientseitig gesetzten Token verlangt.
+
+      Lösung: Landet eine Soft-Navigation auf /kontakt, erzwingen wir einen
+      echten Reload. astro:after-swap feuert ausschließlich bei Soft-Navigation
+      (nie beim Voll-Load), daher entsteht keine Reload-Schleife.
+    -->
+    <script is:inline>
+      document.addEventListener("astro:after-swap", () => {
+        if (location.pathname.replace(/\/+$/, "") === "/kontakt") {
+          window.location.reload();
+        }
+      });
+    </script>
   </body>
 </html>
