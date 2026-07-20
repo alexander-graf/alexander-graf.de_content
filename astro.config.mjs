@@ -42,6 +42,10 @@ const fontsConfig = Object.entries(theme.fonts.font_family)
       weights,
       display: "swap",
       fallbacks: [fallback],
+      // Nur "latin": Ohne diese Angabe laedt Astro jeden Schnitt zusaetzlich
+      // als latin-ext und praeloaded alles mit hoechster Prioritaet — auf einer
+      // deutschsprachigen Seite werden die ext-Dateien nie gebraucht.
+      subsets: ["latin"],
     };
   });
 
