@@ -32,6 +32,16 @@ export const titleify = (content: string) => {
     .join(" ");
 };
 
+// Kurzer Klartext-Auszug für den clientseitigen Suchindex. Der volle
+// Markdown-Body jedes Beitrags wurde bisher in die Such-Props JEDER Seite
+// serialisiert (bei 41 Beiträgen ~161 KB) und bei jeder Client-Navigation neu
+// hydratisiert — Hauptursache für die träge Navigation. Ein Auszug genügt für
+// Titel-/Beschreibungs-/Anfangstext-Suche und schrumpft die Seite drastisch.
+export const searchExcerpt = (content: string, max = 500) => {
+  const text = plainify(content || "").replace(/\s+/g, " ").trim();
+  return text.length > max ? text.slice(0, max) : text;
+};
+
 // plainify
 export const plainify = (content: string) => {
   if (!content) return "";

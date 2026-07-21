@@ -4,6 +4,7 @@ import Base from "@/layouts/Base.astro";
 import BlogSearch from "@/components/BlogSearch";
 import { getSinglePage } from "@/lib/contentParser.astro";
 import { sortByDate } from "@/lib/utils/sortFunctions";
+import { searchExcerpt } from "@/lib/utils/textConverter";
 import type { CollectionEntry } from "astro:content";
 import { getEntry } from "astro:content";
 
@@ -15,7 +16,7 @@ const sortedPosts = sortByDate(posts);
 // Map posts to a plain serializable structure for React to avoid hydration errors
 const postsForSearch = sortedPosts.map(post => ({
   id: post.id,
-  body: post.body || "",
+  body: searchExcerpt(post.body),
   data: {
     title: post.data.title,
     description: post.data.description || "",
@@ -38,7 +39,7 @@ const postsForSearch = sortedPosts.map(post => ({
         </p>
       </div>
 
-      <BlogSearch client:load posts={postsForSearch} summaryLength={summary_length} />
+      <BlogSearch client:idle posts={postsForSearch} summaryLength={summary_length} />
     </div>
   </section>
 </Base>
