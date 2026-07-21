@@ -25,24 +25,11 @@ const LOAD_MORE_COUNT = 10;
 export default function GlobalSearch({ posts: postsProp, pages: pagesProp }: Props) {
   const [posts, setPosts] = useState<SearchItem[]>(postsProp ?? []);
   const [pages, setPages] = useState<SearchItem[]>(pagesProp ?? []);
-
-  useEffect(() => {
-    if (postsProp || pagesProp) return; // Props gegeben → kein Fetch
-    let cancelled = false;
-    fetch("/search-index.json")
-      .then((r) => r.json())
-      .then((d: { posts?: SearchItem[]; pages?: SearchItem[] }) => {
-        if (cancelled) return;
-        setPosts(d.posts ?? []);
-        setPages(d.pages ?? []);
-      })
-      .catch(() => {
-        /* Suche ist nicht kritisch — bei Fehler bleibt sie leer. */
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // Der Index wird erst beim ersten Öffnen der Suche geladen — wer nie sucht,
+  // lädt die JSON gar nicht. Props (falls übergeben) gelten als bereits geladen.
+  const [indexLoaded, setIndexLoaded] = useState<boolean>(
+    Boolean(postsProp || pagesProp),
+  );
 
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,6 +37,26 @@ export default function GlobalSearch({ posts: postsProp, pages: pagesProp }: Pro
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Suchindex lazy laden: erst wenn die Suche geöffnet wird, und nur einmal.
+  useEffect(() => {
+    if (!isOpen || indexLoaded) return;
+    let cancelled = false;
+    fetch("/search-index.json")
+      .then((r) => r.json())
+      .then((d: { posts?: SearchItem[]; pages?: SearchItem[] }) => {
+        if (cancelled) return;
+        setPosts(d.posts ?? []);
+        setPages(d.pages ?? []);
+        setIndexLoaded(true);
+      })
+      .catch(() => {
+        /* Suche ist nicht kritisch — bei Fehler bleibt sie leer. */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, indexLoaded]);
 
   // Global hotkey 's' / 'S' to open search
   useEffect(() => {

@@ -28,3 +28,4 @@ actions-runner/
 scripts/stats_config.json
 scripts/*.log
 git_pull.log
+tsconfig.tsbuildinfo
