@@ -3,8 +3,6 @@ import Logo from "@/components/Logo.astro";
 import { nav_button } from "@/config/config.json";
 import menu from "@/config/menu.json";
 import GlobalSearch from "@/components/GlobalSearch";
-import { getSinglePage } from "@/lib/contentParser.astro";
-import { searchExcerpt } from "@/lib/utils/textConverter";
 
 const pathname = Astro.url.pathname;
 
@@ -22,28 +20,8 @@ export interface NavigationLink {
 
 const { main }: { main: NavigationLink[] } = menu;
 
-const posts = await getSinglePage("blog");
-const pages = await getSinglePage("pages");
-
-const postsForSearch = posts.map(post => ({
-  id: post.id,
-  title: post.data.title || "",
-  description: post.data.description || "",
-  tags: post.data.tags || [],
-  body: searchExcerpt(post.body),
-  type: "blog",
-  url: `/blog/${post.id}`
-}));
-
-const pagesForSearch = pages.map(page => ({
-  id: page.id,
-  title: page.data.title || "",
-  description: page.data.description || "",
-  tags: [],
-  body: searchExcerpt(page.body),
-  type: "page",
-  url: `/${page.id}`
-}));
+// Die Suchdaten stecken nicht mehr in jeder Seite, sondern werden von
+// GlobalSearch einmal von /search-index.json geladen.
 ---
 
 <header class="header">
@@ -87,7 +65,7 @@ const pagesForSearch = pages.map(page => ({
           <>
             {menu.name === "Kontakt" ? (
               <li class="nav-item flex items-center justify-center">
-                <GlobalSearch client:idle posts={postsForSearch} pages={pagesForSearch} transition:persist />
+                <GlobalSearch client:idle transition:persist />
 
               </li>
             ) : menu.hasChildren ? (

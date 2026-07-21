@@ -39,7 +39,7 @@ const postsForSearch = sortedPosts.map(post => ({
         </p>
       </div>
 
-      <BlogSearch client:idle posts={postsForSearch} summaryLength={summary_length} />
+      <BlogSearch client:load posts={postsForSearch} summaryLength={summary_length} />
     </div>
   </section>
 </Base>

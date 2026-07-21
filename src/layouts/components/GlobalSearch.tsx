@@ -12,14 +12,38 @@ interface SearchItem {
 }
 
 interface Props {
-  posts: SearchItem[];
-  pages: SearchItem[];
+  // Optional: werden Props übergeben, wird nicht gefetcht (Rückwärtskompatibel).
+  // Ohne Props lädt die Komponente den Index einmal von /search-index.json,
+  // damit die Suchdaten nicht in jede Seite eingebettet werden müssen.
+  posts?: SearchItem[];
+  pages?: SearchItem[];
 }
 
 const INITIAL_VISIBLE_COUNT = 10;
 const LOAD_MORE_COUNT = 10;
 
-export default function GlobalSearch({ posts, pages }: Props) {
+export default function GlobalSearch({ posts: postsProp, pages: pagesProp }: Props) {
+  const [posts, setPosts] = useState<SearchItem[]>(postsProp ?? []);
+  const [pages, setPages] = useState<SearchItem[]>(pagesProp ?? []);
+
+  useEffect(() => {
+    if (postsProp || pagesProp) return; // Props gegeben → kein Fetch
+    let cancelled = false;
+    fetch("/search-index.json")
+      .then((r) => r.json())
+      .then((d: { posts?: SearchItem[]; pages?: SearchItem[] }) => {
+        if (cancelled) return;
+        setPosts(d.posts ?? []);
+        setPages(d.pages ?? []);
+      })
+      .catch(() => {
+        /* Suche ist nicht kritisch — bei Fehler bleibt sie leer. */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
