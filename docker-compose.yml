@@ -14,7 +14,7 @@ services:
       - "traefik.http.middlewares.alex-redirect.redirectregex.regex=^https://alexander-graf\\.de/(.*)"
       - "traefik.http.middlewares.alex-redirect.redirectregex.replacement=https://alexandergraf.de/$$1"
       - "traefik.http.middlewares.alex-redirect.redirectregex.permanent=true"
-      - "traefik.http.routers.alex-astro.middlewares=coraza-waf@file,alex-redirect"
+      - "traefik.http.routers.alex-astro.middlewares=alex-redirect"
       - "traefik.http.services.alex-astro.loadbalancer.server.port=80"
 
   cms-auth:
@@ -34,7 +34,7 @@ services:
       - "traefik.http.routers.alex-cms-auth.rule=(Host(`${DOMAIN}`) || Host(`alexander-graf.de`)) && (PathPrefix(`/auth`) || PathPrefix(`/callback`))"
       - "traefik.http.routers.alex-cms-auth.entrypoints=websecure"
       - "traefik.http.routers.alex-cms-auth.tls.certresolver=myresolver"
-      - "traefik.http.routers.alex-cms-auth.middlewares=coraza-waf@file,alex-redirect"
+      - "traefik.http.routers.alex-cms-auth.middlewares=alex-redirect"
       - "traefik.http.services.alex-cms-auth.loadbalancer.server.port=3000"
 
 networks:
