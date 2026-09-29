@@ -1,7 +1,7 @@
 ---
 company: "PC-Service & IT-Dienstleistungen"
 role: "Selbstständig"
-dateStart: "01/01/2010"
+dateStart: "01/01/2000"
 dateEnd: "Present"
 ---
 

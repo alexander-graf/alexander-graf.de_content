@@ -1,12 +1,12 @@
 ---
 banner:
   title: "Hallo, ich bin Alexander Graf"
-  content: "Ich bin **Systemarchitekt**, **Technik-Enthusiast**, **Problemlöser**, **INTJ** und jemand, der das *Aha-Gefühl* dem schnellen Googeln vorzieht.<br/><br/>Mit 16 bekam ich meinen ersten PC. Ich dachte sofort: „Damit muss doch irgendwie was anzufangen sein.“ Das Gefühl ist bis heute geblieben — nur die Werkzeuge wurden besser."
+  content: "Seit dem Jahr 2000 betreue ich die IT kleiner und mittlerer Betriebe im Nürnberger Land — Arbeitsplätze, Server, Netzwerke, Datensicherung. Einige Kunden aus meinem ersten Jahr sind heute noch dabei.<br/><br/>Ich bin **Systemarchitekt**, **Technik-Enthusiast** und **Problemlöser** — jemand, der das *Aha-Gefühl* dem schnellen Googeln vorzieht. Das ist bis heute so geblieben, nur die Werkzeuge wurden besser.<br/><br/>Nebenbei schreibe ich hier über die Technik, die mich beschäftigt."
   image: /images/banner-art.png
   button:
     enable: true
-    label: "Zum Blog"
-    link: "/blog"
+    label: "Was ich für Betriebe mache"
+    link: "/faq"
 
 # feature (Tech Stack)
 feature:
@@ -37,7 +37,7 @@ services:
       link: "#"
 
   - title: "Heute"
-    content: "Betreibe ich Linux-Server, baue Docker-Infrastrukturen, entwickle Shopware-Plugins und schreibe über die Dinge, die mich faszinieren. Dieser Blog ist mein Notizbuch — technisch, manchmal quer, immer ehrlich."
+    content: "Betreue ich Betriebe zwischen drei und dreißig Arbeitsplätzen: Wenn etwas steht, bin ich per Fernwartung in Minuten drauf — nicht am nächsten Werktag. Daneben betreibe ich Linux-Server, baue Docker-Infrastrukturen und entwickle Shopware-Plugins. Und schreibe über die Dinge, die mich faszinieren: Dieser Blog ist mein Notizbuch — technisch, manchmal quer, immer ehrlich."
     images:
       - "/images/service-slide-2.png"
     button:
@@ -53,8 +53,8 @@ workflow:
 
 # call_to_action
 call_to_action:
-  title: "Lust auf Austausch?"
-  content: "Schreib mir gerne eine Nachricht, wenn du Fragen zu meinen Blogposts hast oder dich über Linux, Docker oder Self-Hosting austauschen willst."
+  title: "Brauchen Sie jemanden für Ihre IT?"
+  content: "Wenn in Ihrem Betrieb etwas steht — oder Sie nicht sicher sind, ob Ihre Datensicherung im Ernstfall wirklich trägt: Rufen Sie mich an, **0179 1577763**. Ein kurzer Blick darauf kostet Sie zwanzig Minuten und sonst nichts. Die häufigsten Fragen beantworte ich [hier](/faq).<br/><br/>Und wenn du einfach über Linux, Docker oder Self-Hosting fachsimpeln willst: schreib mir gern, das freut mich genauso."
   image: "/images/cta.png"
   button:
     enable: true

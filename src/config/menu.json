@@ -13,6 +13,10 @@
       "url": "/work"
     },
     {
+      "name": "Häufige Fragen",
+      "url": "/faq"
+    },
+    {
       "name": "Kontakt",
       "url": "/kontakt"
     }
@@ -24,6 +28,10 @@
         {
           "text": "Mein Weg",
           "url": "/work"
+        },
+        {
+          "text": "Häufige Fragen",
+          "url": "/faq"
         },
         {
           "text": "Kontakt",
