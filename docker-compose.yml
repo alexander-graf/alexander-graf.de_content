@@ -8,7 +8,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      - "traefik.http.routers.alex-astro.rule=Host(`${DOMAIN}`) || Host(`alexander-graf.de`)"
+      # /zeichnung ausgenommen: faellt der Auth-Router unten aus (z.B. ZEICHNUNG_AUTH
+      # fehlt), gibt es 404 statt einer ungeschuetzten Seite.
+      - "traefik.http.routers.alex-astro.rule=(Host(`${DOMAIN}`) || Host(`alexander-graf.de`)) && !Path(`/zeichnung`) && !PathPrefix(`/zeichnung/`)"
       - "traefik.http.routers.alex-astro.entrypoints=websecure"
       - "traefik.http.routers.alex-astro.tls.certresolver=myresolver"
       - "traefik.http.middlewares.alex-redirect.redirectregex.regex=^https://alexander-graf\\.de/(.*)"
@@ -16,6 +18,15 @@ services:
       - "traefik.http.middlewares.alex-redirect.redirectregex.permanent=true"
       - "traefik.http.routers.alex-astro.middlewares=alex-redirect"
       - "traefik.http.services.alex-astro.loadbalancer.server.port=80"
+      # /zeichnung nur fuer Alex: eigener Router mit Basic Auth. Der Hash
+      # (htpasswd -nbB) steht in der .env auf dem Server, nicht im Repo.
+      - "traefik.http.middlewares.alex-zeichnung-auth.basicauth.users=${ZEICHNUNG_AUTH}"
+      - "traefik.http.routers.alex-zeichnung.rule=(Host(`${DOMAIN}`) || Host(`alexander-graf.de`)) && (Path(`/zeichnung`) || PathPrefix(`/zeichnung/`))"
+      - "traefik.http.routers.alex-zeichnung.priority=100"
+      - "traefik.http.routers.alex-zeichnung.entrypoints=websecure"
+      - "traefik.http.routers.alex-zeichnung.tls.certresolver=myresolver"
+      - "traefik.http.routers.alex-zeichnung.middlewares=alex-redirect,alex-zeichnung-auth"
+      - "traefik.http.routers.alex-zeichnung.service=alex-astro"
 
   cms-auth:
     build: ./oauth-proxy

@@ -59,7 +59,8 @@ export default defineConfig({
   fonts: fontsConfig,
   integrations: [
     react(),
-    sitemap(),
+    // /zeichnung ist privat (Basic Auth) und gehoert nicht in die Sitemap.
+    sitemap({ filter: (page) => !page.includes("/zeichnung") }),
     AutoImport({
       imports: [
         "@/shortcodes/Button",

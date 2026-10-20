@@ -1,0 +1,29 @@
+---
+// Private Zeichenflaeche. Zugriffsschutz kommt nicht von hier, sondern von
+// der Traefik-Basic-Auth auf /zeichnung (docker-compose.yml, ZEICHNUNG_AUTH).
+// Bewusst ohne Base-Layout: kein Header/Footer, kein Tag Manager, kein
+// Cookie-Hinweis ueber der Flaeche.
+import Zeichenflaeche from "@/components/Zeichenflaeche";
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>Zeichnung</title>
+    <style is:global>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <Zeichenflaeche client:only="react" />
+  </body>
+</html>

@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "postbuild": "node scripts/copy-excalidraw-assets.mjs",
     "format": "prettier -w .",
     "check": "astro check",
     "preview": "astro preview",
@@ -20,6 +21,7 @@
     "@astrojs/react": "5.0.0",
     "@astrojs/sitemap": "3.7.1",
     "@digi4care/astro-google-tagmanager": "^1.6.0",
+    "@excalidraw/excalidraw": "0.18.1",
     "@justinribeiro/lite-youtube": "^1.9.0",
     "@tailwindcss/vite": "^4.2.1",
     "astro": "6.0.2",
