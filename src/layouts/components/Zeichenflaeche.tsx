@@ -1,12 +1,14 @@
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw, useHandleLibrary } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
 import type {
   AppState,
   BinaryFiles,
+  ExcalidrawImperativeAPI,
   ExcalidrawInitialDataState,
 } from "@excalidraw/excalidraw/types";
+import type { LibraryPersistenceAdapter } from "@excalidraw/excalidraw/data/library";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 
 // Im Build liegen die Schriften unter /excalidraw-assets/ (kopiert von
 // scripts/copy-excalidraw-assets.mjs). Im Dev-Server fehlen sie dort, dann
@@ -16,6 +18,24 @@ if (import.meta.env.PROD) {
 }
 
 const STORAGE_KEY = "zeichnung:szene";
+const LIBRARY_KEY = "zeichnung:bibliothek";
+
+// Bibliothek getrennt von der Szene sichern. useHandleLibrary laedt sie beim
+// Start und nimmt auch Bibliotheken entgegen, die libraries.excalidraw.com
+// per "Add to Excalidraw" an diese Seite zurueckschickt (#addLibrary=...).
+const libraryAdapter: LibraryPersistenceAdapter = {
+  load() {
+    try {
+      const raw = localStorage.getItem(LIBRARY_KEY);
+      return raw ? { libraryItems: JSON.parse(raw) } : null;
+    } catch {
+      return null;
+    }
+  },
+  save({ libraryItems }) {
+    localStorage.setItem(LIBRARY_KEY, JSON.stringify(libraryItems));
+  },
+};
 
 // Nur das Noetigste vom AppState sichern; der Rest (Auswahl, offene Dialoge,
 // Fenstergroesse) soll beim naechsten Oeffnen nicht wieder auftauchen.
@@ -39,7 +59,10 @@ const loadScene = (): ExcalidrawInitialDataState | null => {
 
 const Zeichenflaeche = () => {
   const initialData = useMemo(loadScene, []);
-  const saveTimer = useRef<number>();
+  const saveTimer = useRef<number | undefined>(undefined);
+  const [excalidrawAPI, setExcalidrawAPI] =
+    useState<ExcalidrawImperativeAPI | null>(null);
+  useHandleLibrary({ excalidrawAPI, adapter: libraryAdapter });
 
   const handleChange = (
     elements: readonly OrderedExcalidrawElement[],
@@ -69,6 +92,7 @@ const Zeichenflaeche = () => {
   return (
     <div style={{ position: "fixed", inset: 0 }}>
       <Excalidraw
+        excalidrawAPI={setExcalidrawAPI}
         initialData={initialData}
         onChange={handleChange}
         langCode="de-DE"
