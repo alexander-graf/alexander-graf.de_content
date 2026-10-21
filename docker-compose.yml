@@ -18,15 +18,49 @@ services:
       - "traefik.http.middlewares.alex-redirect.redirectregex.permanent=true"
       - "traefik.http.routers.alex-astro.middlewares=alex-redirect"
       - "traefik.http.services.alex-astro.loadbalancer.server.port=80"
-      # /zeichnung nur fuer Alex: eigener Router mit Basic Auth. Der Hash
-      # (htpasswd -nbB) steht in der .env auf dem Server, nicht im Repo.
-      - "traefik.http.middlewares.alex-zeichnung-auth.basicauth.users=${ZEICHNUNG_AUTH}"
+      # Basic Auth fuer alles, was nur fuer Alex ist (/zeichnung, tools., draw.).
+      # Der Hash (htpasswd -nbB) steht in der .env auf dem Server, nicht im Repo.
+      # Faellt dieser Container aus, fehlt die Middleware und die geschuetzten
+      # Router liefern 404 statt offener Seiten.
+      - "traefik.http.middlewares.alex-privat-auth.basicauth.users=${ZEICHNUNG_AUTH}"
       - "traefik.http.routers.alex-zeichnung.rule=(Host(`${DOMAIN}`) || Host(`alexander-graf.de`)) && (Path(`/zeichnung`) || PathPrefix(`/zeichnung/`))"
       - "traefik.http.routers.alex-zeichnung.priority=100"
       - "traefik.http.routers.alex-zeichnung.entrypoints=websecure"
       - "traefik.http.routers.alex-zeichnung.tls.certresolver=myresolver"
-      - "traefik.http.routers.alex-zeichnung.middlewares=alex-redirect,alex-zeichnung-auth"
+      - "traefik.http.routers.alex-zeichnung.middlewares=alex-redirect,alex-privat-auth"
       - "traefik.http.routers.alex-zeichnung.service=alex-astro"
+
+  # IT-Tools und draw.io: fertige Images, je eine eigene Subdomain (Wildcard-DNS
+  # zeigt schon hierher). Unterpfade gehen nicht, beide laden von /assets bzw. /.
+  it-tools:
+    image: corentinth/it-tools:2024.10.22-7ca5933
+    container_name: alexander-graf-it-tools
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.alex-it-tools.rule=Host(`tools.alexandergraf.de`)"
+      - "traefik.http.routers.alex-it-tools.entrypoints=websecure"
+      - "traefik.http.routers.alex-it-tools.tls.certresolver=myresolver"
+      - "traefik.http.routers.alex-it-tools.middlewares=alex-privat-auth"
+      - "traefik.http.services.alex-it-tools.loadbalancer.server.port=80"
+
+  drawio:
+    image: jgraph/drawio:32.2.0
+    container_name: alexander-graf-drawio
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.alex-drawio.rule=Host(`draw.alexandergraf.de`)"
+      - "traefik.http.routers.alex-drawio.entrypoints=websecure"
+      - "traefik.http.routers.alex-drawio.tls.certresolver=myresolver"
+      - "traefik.http.routers.alex-drawio.middlewares=alex-privat-auth"
+      - "traefik.http.services.alex-drawio.loadbalancer.server.port=8080"
 
   cms-auth:
     build: ./oauth-proxy
