@@ -16,13 +16,6 @@ services:
       - "traefik.http.middlewares.alex-redirect.redirectregex.permanent=true"
       - "traefik.http.routers.alex-astro.middlewares=alex-redirect"
       - "traefik.http.services.alex-astro.loadbalancer.server.port=80"
-      # Basic Auth fuer tools. und draw. Der Hash (htpasswd -nbB) steht in der
-      # .env auf dem Server, nicht im Repo. Faellt dieser Container aus, fehlt
-      # die Middleware und die geschuetzten Router liefern 404 statt offener Seiten.
-      # /zeichnung ist bewusst offen: die Seite selbst haelt nichts, die eigene
-      # Zeichnung liegt im localStorage, gemeinsame Raeume schuetzt der Schluessel
-      # im Link (siehe src/layouts/components/zeichnung/raum.ts).
-      - "traefik.http.middlewares.alex-privat-auth.basicauth.users=${ZEICHNUNG_AUTH}"
 
   # Raum-Server fuer gemeinsames Zeichnen auf /zeichnung. Reicht nur
   # verschluesselte Pakete zwischen den Teilnehmern eines Raums weiter und
@@ -59,7 +52,6 @@ services:
       - "traefik.http.routers.alex-it-tools.rule=Host(`tools.alexandergraf.de`)"
       - "traefik.http.routers.alex-it-tools.entrypoints=websecure"
       - "traefik.http.routers.alex-it-tools.tls.certresolver=myresolver"
-      - "traefik.http.routers.alex-it-tools.middlewares=alex-privat-auth"
       - "traefik.http.services.alex-it-tools.loadbalancer.server.port=80"
 
   drawio:
@@ -74,7 +66,6 @@ services:
       - "traefik.http.routers.alex-drawio.rule=Host(`draw.alexandergraf.de`)"
       - "traefik.http.routers.alex-drawio.entrypoints=websecure"
       - "traefik.http.routers.alex-drawio.tls.certresolver=myresolver"
-      - "traefik.http.routers.alex-drawio.middlewares=alex-privat-auth"
       - "traefik.http.services.alex-drawio.loadbalancer.server.port=8080"
 
   cms-auth:
