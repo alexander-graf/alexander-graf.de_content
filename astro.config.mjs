@@ -55,11 +55,24 @@ export default defineConfig({
   base: config.site.base_path ? config.site.base_path : "/",
   trailingSlash: config.site.trailing_slash ? "always" : "never",
   image: { service: sharpImageService() },
-  vite: { plugins: [tailwindcss()] },
+  vite: {
+    plugins: [tailwindcss()],
+    // Nur fuer `npm run dev`: Raum-Server lokal (docker run -p 3002:80
+    // excalidraw/excalidraw-room:sha-03ff435). In Produktion macht das Traefik.
+    server: {
+      proxy: {
+        "/zeichnung-sync": {
+          target: "http://localhost:3002",
+          ws: true,
+          rewrite: (p) => p.replace(/^\/zeichnung-sync/, ""),
+        },
+      },
+    },
+  },
   fonts: fontsConfig,
   integrations: [
     react(),
-    // /zeichnung ist privat (Basic Auth) und gehoert nicht in die Sitemap.
+    // /zeichnung ist ein Werkzeug, keine Inhaltsseite — nicht in die Sitemap.
     sitemap({ filter: (page) => !page.includes("/zeichnung") }),
     AutoImport({
       imports: [

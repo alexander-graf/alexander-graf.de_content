@@ -8,9 +8,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      # /zeichnung ausgenommen: faellt der Auth-Router unten aus (z.B. ZEICHNUNG_AUTH
-      # fehlt), gibt es 404 statt einer ungeschuetzten Seite.
-      - "traefik.http.routers.alex-astro.rule=(Host(`${DOMAIN}`) || Host(`alexander-graf.de`)) && !Path(`/zeichnung`) && !PathPrefix(`/zeichnung/`)"
+      - "traefik.http.routers.alex-astro.rule=Host(`${DOMAIN}`) || Host(`alexander-graf.de`)"
       - "traefik.http.routers.alex-astro.entrypoints=websecure"
       - "traefik.http.routers.alex-astro.tls.certresolver=myresolver"
       - "traefik.http.middlewares.alex-redirect.redirectregex.regex=^https://alexander-graf\\.de/(.*)"
@@ -18,17 +16,34 @@ services:
       - "traefik.http.middlewares.alex-redirect.redirectregex.permanent=true"
       - "traefik.http.routers.alex-astro.middlewares=alex-redirect"
       - "traefik.http.services.alex-astro.loadbalancer.server.port=80"
-      # Basic Auth fuer alles, was nur fuer Alex ist (/zeichnung, tools., draw.).
-      # Der Hash (htpasswd -nbB) steht in der .env auf dem Server, nicht im Repo.
-      # Faellt dieser Container aus, fehlt die Middleware und die geschuetzten
-      # Router liefern 404 statt offener Seiten.
+      # Basic Auth fuer tools. und draw. Der Hash (htpasswd -nbB) steht in der
+      # .env auf dem Server, nicht im Repo. Faellt dieser Container aus, fehlt
+      # die Middleware und die geschuetzten Router liefern 404 statt offener Seiten.
+      # /zeichnung ist bewusst offen: die Seite selbst haelt nichts, die eigene
+      # Zeichnung liegt im localStorage, gemeinsame Raeume schuetzt der Schluessel
+      # im Link (siehe src/layouts/components/zeichnung/raum.ts).
       - "traefik.http.middlewares.alex-privat-auth.basicauth.users=${ZEICHNUNG_AUTH}"
-      - "traefik.http.routers.alex-zeichnung.rule=(Host(`${DOMAIN}`) || Host(`alexander-graf.de`)) && (Path(`/zeichnung`) || PathPrefix(`/zeichnung/`))"
-      - "traefik.http.routers.alex-zeichnung.priority=100"
-      - "traefik.http.routers.alex-zeichnung.entrypoints=websecure"
-      - "traefik.http.routers.alex-zeichnung.tls.certresolver=myresolver"
-      - "traefik.http.routers.alex-zeichnung.middlewares=alex-redirect,alex-privat-auth"
-      - "traefik.http.routers.alex-zeichnung.service=alex-astro"
+
+  # Raum-Server fuer gemeinsames Zeichnen auf /zeichnung. Reicht nur
+  # verschluesselte Pakete zwischen den Teilnehmern eines Raums weiter und
+  # speichert nichts. Gleicher Host wie die Seite, Traefik schneidet
+  # /zeichnung-sync ab (der Server erwartet /socket.io).
+  zeichnung-sync:
+    image: excalidraw/excalidraw-room:sha-03ff435
+    container_name: alexander-graf-zeichnung-sync
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.alex-zeichnung-sync.rule=(Host(`${DOMAIN}`) || Host(`alexander-graf.de`)) && PathPrefix(`/zeichnung-sync/`)"
+      - "traefik.http.routers.alex-zeichnung-sync.priority=1000"
+      - "traefik.http.routers.alex-zeichnung-sync.entrypoints=websecure"
+      - "traefik.http.routers.alex-zeichnung-sync.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.alex-zeichnung-sync-strip.stripprefix.prefixes=/zeichnung-sync"
+      - "traefik.http.routers.alex-zeichnung-sync.middlewares=alex-zeichnung-sync-strip"
+      - "traefik.http.services.alex-zeichnung-sync.loadbalancer.server.port=80"
 
   # IT-Tools und draw.io: fertige Images, je eine eigene Subdomain (Wildcard-DNS
   # zeigt schon hierher). Unterpfade gehen nicht, beide laden von /assets bzw. /.

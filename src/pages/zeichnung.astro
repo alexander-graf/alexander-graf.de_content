@@ -1,6 +1,6 @@
 ---
-// Private Zeichenflaeche. Zugriffsschutz kommt nicht von hier, sondern von
-// der Traefik-Basic-Auth auf /zeichnung (docker-compose.yml, ZEICHNUNG_AUTH).
+// Zeichenflaeche mit gemeinsamen Raeumen per Link. Offen ohne Login: die
+// eigene Zeichnung liegt nur im localStorage des Browsers.
 // Bewusst ohne Base-Layout: kein Header/Footer, kein Tag Manager, kein
 // Cookie-Hinweis ueber der Flaeche.
 import Zeichenflaeche from "@/components/Zeichenflaeche";
