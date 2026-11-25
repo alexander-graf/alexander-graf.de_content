@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Helios – three.js Motion-Graphics-Demo</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  @font-face { font-family:"Noto Serif"; font-weight:300; src:url(fonts/NotoSerif-Light.woff) format("woff"); }
+  @font-face { font-family:"Noto Sans"; font-weight:400; src:url(fonts/NotoSans-Regular.woff) format("woff"); }
+  @font-face { font-family:"Noto Sans"; font-weight:500; src:url(fonts/NotoSans-Medium.woff) format("woff"); }
+  /* Texte/Zeiten: unten im Skript unter CONFIG */
+  :root { --creme:#F7F2E4; --tinte:#2C3628; --oliv:#617603; --oliv2:#87a404; --gold:#FFB600; --gelb:#FED05B; --blau:#486066; }
+  html,body { margin:0; height:100%; background:var(--creme); overflow:hidden; color:var(--tinte); }
+  #buehne { position:fixed; inset:0; }
+  canvas { display:block; }
+  .ebene { position:absolute; inset:0; pointer-events:none; font-family:"Noto Sans",sans-serif; }
+  .serif { font-family:"Noto Serif",Georgia,serif; font-weight:300; }
+  #claim { position:absolute; left:0; right:0; top:36%; text-align:center; font-size:5.2vw; line-height:1.15; }
+  #claim .z2 { color:var(--oliv); }
+  #claim .strich { width:16vw; height:3px; background:var(--gold); margin:2.2vw auto 0; transform-origin:center; border-radius:2px; }
+  .titel { position:absolute; left:6vw; top:7vh; font-size:2.6vw; }
+  .titel small { display:block; font-family:"Noto Sans",sans-serif; font-size:1.05vw; letter-spacing:.18em; text-transform:uppercase; color:var(--oliv); margin-bottom:.6vw; font-weight:500; }
+  .marke { position:absolute; transform:translate(-50%,-50%); font-size:1.35vw; font-weight:500; white-space:nowrap;
+           background:rgba(255,255,255,.78); padding:.45vw 1.1vw; border-radius:99px; box-shadow:0 .3vw 1.2vw rgba(44,54,40,.08); }
+  .marke.mitte { background:var(--tinte); color:var(--creme); }
+  #legende { position:absolute; right:7vw; top:50%; transform:translateY(-50%); font-size:1.4vw; }
+  #legende div { display:flex; align-items:center; gap:.9vw; margin:1.1vw 0; }
+  #legende i { width:1vw; height:1vw; border-radius:50%; display:inline-block; }
+  #legende b { font-weight:500; min-width:4.5vw; text-align:right; font-variant-numeric:tabular-nums; }
+  #zahl { position:absolute; transform:translate(-50%,-50%); text-align:center; font-size:4.2vw; }
+  #zahl small { display:block; font-family:"Noto Sans",sans-serif; font-size:1vw; letter-spacing:.15em; text-transform:uppercase; color:var(--oliv); }
+  #hinweis { position:absolute; left:6vw; bottom:6vh; font-size:.95vw; color:var(--blau); }
+  /* Bedienleiste – mit ?clean oder Taste H ausblenden */
+  #leiste { position:fixed; left:0; right:0; bottom:0; display:flex; gap:12px; align-items:center; padding:10px 16px;
+            background:rgba(44,54,40,.82); color:#F7F2E4; font:13px "Noto Sans",sans-serif; }
+  #leiste button { background:none; border:1px solid #F7F2E4; color:#F7F2E4; border-radius:4px; padding:3px 10px; cursor:pointer; }
+  #leiste input { flex:1; accent-color:#FFB600; }
+  #zeit { font-variant-numeric:tabular-nums; min-width:90px; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "./three.module.min.js"
+} }
+</script>
+</head>
+<body>
+<div id="buehne"></div>
+
+<div class="ebene">
+  <div id="claim" class="serif"><div class="z1"></div><div class="z2"></div><div class="strich"></div></div>
+  <div id="tNatur" class="titel serif"><small></small><span></span></div>
+  <div id="tNetz"  class="titel serif"><small></small><span></span></div>
+  <div id="tDia"   class="titel serif"><small></small><span></span></div>
+  <div id="marken"></div>
+  <div id="zahl" class="serif"></div>
+  <div id="legende"></div>
+  <div id="hinweis"></div>
+</div>
+
+<div id="leiste">
+  <button id="play">Pause</button>
+  <input id="scrub" type="range" min="0" step="0.01">
+  <span id="zeit"></span>
+  <span>Leertaste = Pause · H = Leiste aus · ←/→ = ±1 s</span>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from './RoomEnvironment.js';
+
+// ───────────────────────── CONFIG ─────────────────────────
+const CONFIG = {
+  dauer: 28,
+  claim: ["Im Einklang mit", "Körper, Geist und Seele"],          t_claim: [0.8, 6.2],
+  natur: { klein: "Naturheilkunde", text: "Die Natur als Vorbild" }, t_natur: [7.2, 13.6],
+  netz:  { klein: "Ganzheitlich",   text: "Vier Bereiche – ein Mensch", mitte: "Mensch",
+           bereiche: ["Psyche", "Psychosomatik", "Geist", "Körper"] }, t_netz: [14.4, 21.6],
+  dia:   { klein: "Infografik", text: "Zahlen ruhig erzählen", zahl: "Gesamt",
+           werte: [["Psyche", 35], ["Psychosomatik", 25], ["Geist", 20], ["Körper", 20]],
+           hinweis: "Platzhalterwerte – nur zur Demonstration" },  t_dia: [22.2, 27.6],
+};
+const C = { creme:0xF7F2E4, tinte:0x2C3628, oliv:0x617603, oliv2:0x87a404, gold:0xFFB600, gelb:0xFED05B, blau:0x486066 };
+const FARBEN4 = [C.gold, C.oliv2, C.blau, C.gelb];
+
+// ───────────────────────── Hilfen ─────────────────────────
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const out3  = x => 1 - (1 - clamp(x)) ** 3;
+const inout = x => { x = clamp(x); return x * x * (3 - 2 * x); };
+const lerp  = (a, b, k) => a + (b - a) * k;
+/** Sichtbarkeit 0..1: weich ein, halten, weich aus */
+const env = (t, [a, b], fi = 0.9, fo = 0.8) => (t < a || t > b) ? 0 : Math.min(out3((t - a) / fi), out3((b - t) / fo));
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const $ = s => document.querySelector(s);
+const hex = c => '#' + c.toString(16).padStart(6, '0');
+
+// ───────────────────────── Grundgerüst ─────────────────────────
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+$('#buehne').appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(C.creme);
+scene.fog = new THREE.Fog(C.creme, 9, 26);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.55;
+
+const camera = new THREE.PerspectiveCamera(35, 16 / 9, 0.1, 100);
+scene.add(new THREE.HemisphereLight(0xfff6dd, 0xd8cfb4, 1.4));
+const sonne = new THREE.DirectionalLight(0xfff1cc, 2.2); sonne.position.set(4, 7, 6); scene.add(sonne);
+
+/** Material, das sich mit der Szene ein-/ausblenden lässt */
+const mats = { kugeln: [], natur: [], netz: [], dia: [] };
+function mat(gruppe, farbe, extra = {}) {
+  const m = new THREE.MeshPhysicalMaterial({ color: farbe, roughness: 0.38, clearcoat: 0.4, clearcoatRoughness: 0.3,
+                                             transparent: true, ...extra });
+  mats[gruppe].push(m); return m;
+}
+const gruppen = { kugeln: new THREE.Group(), natur: new THREE.Group(), netz: new THREE.Group(), dia: new THREE.Group() };
+Object.values(gruppen).forEach(g => scene.add(g));
+
+// ───────────────────────── 1) Schwebende Kugeln ─────────────────────────
+const kugeln = [];
+{
+  const geo = new THREE.SphereGeometry(1, 64, 32);
+  const pal = [C.gelb, C.gold, C.oliv2, C.oliv, C.blau, 0xffffff];
+  for (let i = 0; i < 16; i++) {
+    const m = new THREE.Mesh(geo, mat('kugeln', pal[i % pal.length]));
+    const r = 0.25 + rnd() * 0.75;
+    m.scale.setScalar(r);
+    const basis = new THREE.Vector3((rnd() - .5) * 16, (rnd() - .5) * 8, -2 - rnd() * 9);
+    // Mitte frei halten (dort steht der Claim)
+    if (Math.abs(basis.x) < 3.5 && Math.abs(basis.y) < 2) basis.x += Math.sign(basis.x || 1) * 4;
+    kugeln.push({ m, basis, phase: rnd() * 6.28, speed: 0.15 + rnd() * 0.2 });
+    gruppen.kugeln.add(m);
+  }
+}
+
+// ───────────────────────── 2) Partikel → Phyllotaxis-Blüte ─────────────────────────
+const N = 5000;
+const pStart = new Float32Array(N * 3), pZiel = new Float32Array(N * 3), pPos = new Float32Array(N * 3), pCol = new Float32Array(N * 3);
+{
+  const gA = new THREE.Color(C.gelb), gB = new THREE.Color(C.gold), gC = new THREE.Color(C.oliv2), gD = new THREE.Color(C.oliv);
+  const tmp = new THREE.Color();
+  for (let i = 0; i < N; i++) {
+    // Start: lockere Wolke
+    const u = rnd() * 6.28, v = Math.acos(2 * rnd() - 1), rr = 4 + rnd() * 6;
+    pStart.set([rr * Math.sin(v) * Math.cos(u) * 1.6, rr * Math.sin(v) * Math.sin(u), rr * Math.cos(v) - 2], i * 3);
+    // Ziel: Sonnenblumen-Spirale (goldener Winkel)
+    const r = 0.036 * Math.sqrt(i), th = i * 2.39996323;
+    pZiel.set([r * Math.cos(th), r * Math.sin(th), 0], i * 3);
+    const k = i / N;
+    if (k < .33) tmp.copy(gA).lerp(gB, k / .33); else if (k < .7) tmp.copy(gB).lerp(gC, (k - .33) / .37); else tmp.copy(gC).lerp(gD, (k - .7) / .3);
+    pCol.set([tmp.r, tmp.g, tmp.b], i * 3);
+  }
+}
+const pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+pGeo.setAttribute('color', new THREE.BufferAttribute(pCol, 3));
+const punktTex = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, '#fff'); gr.addColorStop(.55, '#fff'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c);
+})();
+const pMat = new THREE.PointsMaterial({ size: 0.075, map: punktTex, vertexColors: true, transparent: true, depthWrite: false });
+mats.natur.push(pMat);
+const punkte = new THREE.Points(pGeo, pMat);
+gruppen.natur.add(punkte);
+
+// ───────────────────────── 3) Netz: Mensch + vier Bereiche ─────────────────────────
+const netz = { knoten: [], linien: [], ring: null };
+{
+  const mitte = new THREE.Mesh(new THREE.SphereGeometry(0.75, 64, 32), mat('netz', C.gold));
+  gruppen.netz.add(mitte); netz.mitte = mitte;
+  const kgeo = new THREE.SphereGeometry(0.42, 48, 24);
+  const R = 2.8;
+  CONFIG.netz.bereiche.forEach((name, i) => {
+    const w = Math.PI / 4 + i * Math.PI / 2;
+    const ziel = new THREE.Vector3(Math.cos(w) * R * 1.35, Math.sin(w) * R * 0.8, 0);
+    const m = new THREE.Mesh(kgeo, mat('netz', [C.oliv2, C.blau, C.oliv, C.gelb][i]));
+    gruppen.netz.add(m);
+    const lg = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+    const lm = new THREE.LineBasicMaterial({ color: C.tinte, transparent: true }); mats.netz.push(lm);
+    const linie = new THREE.Line(lg, lm); gruppen.netz.add(linie);
+    netz.knoten.push({ m, ziel, name }); netz.linien.push(linie);
+  });
+  // gestrichelter Ring durch die vier Knoten
+  const pts = []; for (let i = 0; i <= 200; i++) { const w = i / 200 * Math.PI * 2 + Math.PI / 4; pts.push(new THREE.Vector3(Math.cos(w) * R * 1.35, Math.sin(w) * R * 0.8, 0)); }
+  const rm = new THREE.LineDashedMaterial({ color: C.oliv, dashSize: 0.12, gapSize: 0.12, transparent: true }); mats.netz.push(rm);
+  netz.ring = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), rm); netz.ring.computeLineDistances();
+  gruppen.netz.add(netz.ring);
+}
+
+// ───────────────────────── 4) 3D-Ringdiagramm ─────────────────────────
+const dia = { segmente: [] };
+{
+  gruppen.dia.rotation.x = -1.05;
+  const summe = CONFIG.dia.werte.reduce((s, [, v]) => s + v, 0);
+  let start = Math.PI / 2;
+  CONFIG.dia.werte.forEach(([name, v], i) => {
+    const arc = v / summe * Math.PI * 2;
+    const mesh = new THREE.Mesh(new THREE.BufferGeometry(), mat('dia', FARBEN4[i], { roughness: 0.5 }));
+    mesh.rotation.z = start - arc;      // Segmente laufen im Uhrzeigersinn
+    gruppen.dia.add(mesh);
+    dia.segmente.push({ mesh, arc, start, letzterArc: -1, name, v });
+    start -= arc;
+  });
+  // Bodenplatte als ruhiger Schatten
+  const platte = new THREE.Mesh(new THREE.CircleGeometry(3.1, 96), mat('dia', 0xefe8d6, { roughness: 1, clearcoat: 0 }));
+  platte.position.z = -0.42; gruppen.dia.add(platte);
+}
+function segmentGeo(arc) {
+  return new THREE.TorusGeometry(2.4, 0.38, 32, Math.max(2, Math.ceil(arc * 40)), Math.max(0.0001, arc));
+}
+
+// ───────────────────────── HTML-Ebenen füllen ─────────────────────────
+$('#claim .z1').textContent = CONFIG.claim[0];
+$('#claim .z2').textContent = CONFIG.claim[1];
+for (const [id, c] of [['#tNatur', CONFIG.natur], ['#tNetz', CONFIG.netz], ['#tDia', CONFIG.dia]]) {
+  $(id + ' small').textContent = c.klein; $(id + ' span').textContent = c.text;
+}
+const marken = [CONFIG.netz.mitte, ...CONFIG.netz.bereiche].map((n, i) => {
+  const d = document.createElement('div'); d.className = 'marke' + (i === 0 ? ' mitte' : ''); d.textContent = n;
+  $('#marken').appendChild(d); return d;
+});
+$('#legende').innerHTML = dia.segmente.map(s => `<div><i style="background:${hex(FARBEN4[dia.segmente.indexOf(s)])}"></i><b>0 %</b>${s.name}</div>`).join('');
+const legB = [...document.querySelectorAll('#legende b')];
+$('#hinweis').textContent = CONFIG.dia.hinweis;
+
+// ───────────────────────── Kamera-Fahrt ─────────────────────────
+// Schlüsselbilder: [Zeit, Position, Blickpunkt]; dazwischen weich interpoliert
+const KAM = [
+  [0,    [0, 0, 13],   [0, 0, -3]],
+  [6.4,  [1.2, .3, 11.5], [0, 0, -3]],
+  [7.4,  [0, 0, 11],   [0, 0, 0]],
+  [13.6, [-.8, .4, 9.2], [0, 0, 0]],
+  [14.6, [0, .3, 13.5], [0, .5, 0]],
+  [21.6, [.9, .6, 12.6], [0, .5, 0]],
+  [22.4, [1.6, 1, 11.5], [1.4, .2, 0]],
+  [28,   [1.1, 1.4, 10.6], [1.4, .2, 0]],
+];
+const v3 = a => new THREE.Vector3(...a);
+function kamera(t) {
+  let i = 0; while (i < KAM.length - 2 && t > KAM[i + 1][0]) i++;
+  const [ta, pa, la] = KAM[i], [tb, pb, lb] = KAM[i + 1];
+  const k = inout((t - ta) / (tb - ta));
+  camera.position.copy(v3(pa).lerp(v3(pb), k));
+  camera.position.y += Math.sin(t * 0.4) * 0.08;          // kaum spürbares Atmen
+  camera.lookAt(v3(la).lerp(v3(lb), k));
+}
+
+// ───────────────────────── Ein Bild für Zeitpunkt t ─────────────────────────
+const tmpV = new THREE.Vector3();
+function aufBildschirm(obj, dy = 0) {
+  obj.getWorldPosition(tmpV); tmpV.y += dy; tmpV.project(camera);
+  return [(tmpV.x * .5 + .5) * innerWidth, (-tmpV.y * .5 + .5) * innerHeight];
+}
+function setzeOpacity(gruppe, a) {
+  gruppen[gruppe].visible = a > 0.002;
+  for (const m of mats[gruppe]) { m.opacity = a; m.depthWrite = gruppe === 'natur' ? false : a > 0.98; }
+}
+function html(el, a, dy = 20) { el.style.opacity = a; el.style.transform = (el.dataset.t || '') + ` translateY(${(1 - a) * dy}px)`; }
+
+function render(t) {
+  kamera(t);
+
+  // 1) Kugeln + Claim
+  const aK = env(t, [0, 6.9], 1.2, 1.0);
+  setzeOpacity('kugeln', aK);
+  for (const k of kugeln) {
+    k.m.position.copy(k.basis);
+    k.m.position.y += Math.sin(t * k.speed * 2 + k.phase) * 0.35;
+    k.m.position.x += Math.cos(t * k.speed * 1.4 + k.phase) * 0.25;
+  }
+  const aC = env(t, CONFIG.t_claim, 1.0, 0.8);
+  html($('#claim'), aC, 24);
+  $('#claim .strich').style.transform = `scaleX(${out3((t - CONFIG.t_claim[0] - 0.6) / 1.2)})`;
+
+  // 2) Partikel-Blüte
+  const [na, nb] = CONFIG.t_natur;
+  setzeOpacity('natur', env(t, [na - 0.4, nb + 0.4], 1.0, 0.9));
+  if (gruppen.natur.visible) {
+    for (let i = 0; i < N; i++) {
+      const verz = (i / N) * 1.4;                                  // innen zuerst
+      const k = inout((t - na - 0.6 - verz) / 3.0);
+      const j = i * 3, drift = Math.sin(t * .5 + i) * .15 * (1 - k);
+      const zx = pZiel[j], zy = pZiel[j + 1], r = Math.hypot(zx, zy);
+      pPos[j]     = lerp(pStart[j] + drift, zx, k);
+      pPos[j + 1] = lerp(pStart[j + 1] + drift, zy, k);
+      pPos[j + 2] = lerp(pStart[j + 2], Math.sin(r * 2.2 - t * 1.2) * 0.18, k);   // sanfte Welle
+    }
+    pGeo.attributes.position.needsUpdate = true;
+    punkte.rotation.z = -t * 0.06;
+    punkte.rotation.x = -0.35 + Math.sin(t * .3) * .05;
+    punkte.position.x = 2.0;
+  }
+  html($('#tNatur'), env(t, [na + 1.2, nb], 1.0, 0.8));
+
+  // 3) Netz
+  const [za, zb] = CONFIG.t_netz;
+  setzeOpacity('netz', env(t, [za, zb], 0.9, 0.8));
+  if (gruppen.netz.visible) {
+    netz.mitte.scale.setScalar(0.6 + 0.4 * out3((t - za) / 1.2) + Math.sin(t * 1.3) * 0.015);
+    netz.knoten.forEach((kn, i) => {
+      const k = out3((t - za - 0.8 - i * 0.55) / 1.6);
+      kn.m.position.copy(kn.ziel).multiplyScalar(lerp(0.2, 1, k));
+      kn.m.position.y += Math.sin(t * .8 + i) * 0.06;
+      kn.m.scale.setScalar(Math.max(0.001, k));
+      const p = netz.linien[i].geometry.attributes.position;
+      p.setXYZ(1, kn.m.position.x, kn.m.position.y, kn.m.position.z); p.needsUpdate = true;
+    });
+    netz.ring.material.opacity *= inout((t - za - 3.2) / 1.2) * 0.8;
+    gruppen.netz.rotation.y = Math.sin(t * .25) * .12;
+  }
+  const aNetz = env(t, [za, zb], 0.9, 0.8);
+  marken.forEach((el, i) => {
+    const obj = i === 0 ? netz.mitte : netz.knoten[i - 1].m;
+    const [x, y] = aufBildschirm(obj, i === 0 ? -1.25 : -0.85);
+    el.dataset.t = `translate(${x}px,${y}px) translate(-50%,-50%)`;
+    el.style.left = el.style.top = '0';
+    const a = i === 0 ? env(t, [za + 0.6, zb], 0.8, 0.8) : env(t, [za + 1.6 + (i - 1) * 0.55, zb], 0.8, 0.8);
+    html(el, gruppen.netz.visible ? a : 0, 10);
+  });
+  html($('#tNetz'), env(t, [za + 0.4, zb], 1.0, 0.8));
+
+  // 4) Ringdiagramm
+  const [da, db] = CONFIG.t_dia;
+  setzeOpacity('dia', env(t, [da - 0.4, db + 0.3], 0.8, 0.8));
+  if (gruppen.dia.visible) {
+    dia.segmente.forEach((s, i) => {
+      const k = out3((t - da - 0.5 - i * 0.6) / 1.5);
+      const arc = Math.round(s.arc * k * 200) / 200;
+      if (arc !== s.letzterArc) { s.mesh.geometry.dispose(); s.mesh.geometry = segmentGeo(arc); s.letzterArc = arc; }
+      s.mesh.rotation.z = s.start - arc;
+      s.mesh.position.z = Math.sin(t * .9 + i * 1.3) * 0.04;
+      legB[i].textContent = Math.round(s.v * k) + ' %';
+    });
+    gruppen.dia.rotation.z = Math.sin(t * .2) * .06;
+  }
+  html($('#tDia'), env(t, [da + 0.2, db], 1.0, 0.8));
+  $('#legende').dataset.t = 'translateY(-50%)';
+  html($('#legende'), env(t, [da + 0.9, db], 1.0, 0.8));
+  html($('#hinweis'), env(t, [da + 1.5, db], 1.0, 0.8) * 0.9, 0);
+  const z = $('#zahl'); const [zx, zy] = aufBildschirm(gruppen.dia);
+  z.style.left = zx + 'px'; z.style.top = zy + 'px';
+  z.innerHTML = `<small>${CONFIG.dia.zahl}</small>${Math.round(100 * out3((t - da - 0.5) / 3.3))} %`;
+  z.dataset.t = 'translate(-50%,-50%)';
+  html(z, env(t, [da + 1.0, db], 1.0, 0.8), 10);
+
+  renderer.render(scene, camera);
+}
+
+// ───────────────────────── Abspielen / Größe / Bedienung ─────────────────────────
+function groesse() {
+  // feste 16:9-Bühne, mittig
+  let w = innerWidth, h = w * 9 / 16; if (h > innerHeight) { h = innerHeight; w = h * 16 / 9; }
+  renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+  const b = $('#buehne'); b.style.left = (innerWidth - w) / 2 + 'px'; b.style.top = (innerHeight - h) / 2 + 'px';
+}
+addEventListener('resize', groesse); groesse();
+
+const params = new URLSearchParams(location.search);
+let t = parseFloat(params.get('t') ?? '0'), laeuft = !params.has('t'), letzte = performance.now();
+const scrub = $('#scrub'); scrub.max = CONFIG.dauer;
+if (params.has('clean')) $('#leiste').style.display = 'none';
+$('#play').onclick = () => { laeuft = !laeuft; $('#play').textContent = laeuft ? 'Pause' : 'Weiter'; };
+scrub.oninput = () => { t = +scrub.value; };
+addEventListener('keydown', e => {
+  if (e.code === 'Space') { e.preventDefault(); $('#play').click(); }
+  if (e.key === 'h' || e.key === 'H') $('#leiste').style.display = $('#leiste').style.display === 'none' ? '' : 'none';
+  if (e.key === 'ArrowRight') t = Math.min(CONFIG.dauer, t + 1);
+  if (e.key === 'ArrowLeft')  t = Math.max(0, t - 1);
+});
+// Für späteren Bild-für-Bild-Export (z. B. Headless-Chrome): window.renderAt(sekunden)
+window.renderAt = s => { laeuft = false; t = s; render(t); };
+
+(function schleife(now) {
+  if (laeuft) { t += (now - letzte) / 1000; if (t >= CONFIG.dauer) t -= CONFIG.dauer; }
+  letzte = now;
+  scrub.value = t; $('#zeit').textContent = t.toFixed(1) + ' / ' + CONFIG.dauer + ' s';
+  render(t);
+  requestAnimationFrame(schleife);
+})(performance.now());
+</script>
+</body>
+</html>
